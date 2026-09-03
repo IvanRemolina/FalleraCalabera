@@ -1,6 +1,5 @@
 "use strict";
 const KEY = "fallera-elo-config",
-  AUTH_KEY = "fallera-elo-authorized",
   THEME_KEY = "fallera-elo-theme",
   API = "https://api.github.com/repos/";
 const DEFAULT_CONFIG = {
@@ -9,7 +8,6 @@ const DEFAULT_CONFIG = {
   branch: "main",
 };
 const BUILT_IN_TOKEN = "";
-const APP_PASSWORD = "fallera";
 const SYNC_INTERVAL = 5000;
 
 // Estado en memoria de la aplicación y referencias a la sincronización activa.
@@ -54,23 +52,12 @@ function applyTheme(theme) {
 
 applyTheme(localStorage.getItem(THEME_KEY) || "light");
 
-function ensureAccess() {
-  // Esta contraseña solo evita ediciones accidentales; no sustituye al token.
-  if (localStorage.getItem(AUTH_KEY) === "yes") return true;
-  const password = prompt("Contraseña de la partida");
-  if (password !== APP_PASSWORD) {
-    toast("Contraseña incorrecta", true);
-    return false;
-  }
-  localStorage.setItem(AUTH_KEY, "yes");
-  return true;
-}
 function ensureCanEdit() {
   if (!config().token) {
     toast("Modo solo lectura: falta configurar el token", true);
     return false;
   }
-  return ensureAccess();
+  return true;
 }
 function show(id, on = true) {
   $(id).classList.toggle("hidden", !on);
@@ -360,7 +347,7 @@ function editionInputs() {
   const deck = db.decks.find((item) => item.id === $("#deckSelect").value);
   const maxEdition = deck?.maxEdition || 0;
   $("#editionChecks").innerHTML = maxEdition
-    ? `<p class="text-sm font-bold">Ediciones incluidas</p><div class="flex flex-wrap gap-4">${Array.from({ length: maxEdition }, (_, index) => `<label class="flex items-center gap-2 text-sm"><input class="edition-check h-4 w-4" type="checkbox" value="${index + 1}" ${index === 0 ? "checked" : ""}/>Edición ${index + 1}</label>`).join("")}</div>`
+    ? `<p class="mb-2 text-sm font-bold">Ediciones incluidas</p><div class="edition-options">${Array.from({ length: maxEdition }, (_, index) => `<label class="edition-option"><input class="edition-check" type="checkbox" value="${index + 1}" ${index === 0 ? "checked" : ""}/><span>${index + 1}</span></label>`).join("")}</div>`
     : '<p class="text-sm text-[#766b5f]">Selecciona una baraja</p>';
 }
 
@@ -506,7 +493,6 @@ $("#themeToggle").onclick = () => {
 };
 
 $("#saveSettingsBtn").onclick = () => {
-  if (!ensureAccess()) return;
   const current = config();
   localStorage.setItem(
     KEY,

@@ -43,8 +43,6 @@ Para guardar los cambios en GitHub:
 
 El token se guarda únicamente en el `localStorage` del navegador que lo configura. No lo compartas ni lo incluyas en el código publicado. Para una instalación compartida, `app.js` admite configurar `BUILT_IN_TOKEN`, pero hacerlo expone el token a cualquier persona que pueda descargar la aplicación.
 
-La contraseña de edición predeterminada es `fallera`. Solo evita modificaciones accidentales en la interfaz; no sustituye los permisos de GitHub ni la seguridad del repositorio.
-
 ## Reglas del cálculo Elo
 
 - Cada jugador nuevo empieza con `100` puntos.
@@ -70,7 +68,7 @@ El historial de partidas es la fuente de verdad. El Elo y las estadísticas se r
 - Los navegadores consultan los datos cada 5 segundos. Es una actualización rápida, no tiempo real, y muchos dispositivos pueden alcanzar el límite de la API pública de GitHub.
 - Si dos personas guardan cambios al mismo tiempo, ambas pueden partir de una versión antigua del archivo y una escritura puede ser rechazada por conflicto. Para el uso casero previsto, conviene que solo una persona edite a la vez.
 
-La contraseña `fallera` está incluida en el JavaScript público y no es una medida de seguridad. El token sí permite escribir en el repositorio, por lo que nunca debe publicarse en `BUILT_IN_TOKEN` ni compartirse.
+El token permite escribir en el repositorio, por lo que nunca debe publicarse en `BUILT_IN_TOKEN` ni compartirse.
 
 ## Datos
 

@@ -217,6 +217,52 @@ select:focus {
   border-radius: 50%;
 }
 
+.edition-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.edition-option {
+  cursor: pointer;
+}
+
+.edition-option input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.edition-option span {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 2px solid var(--card-purple);
+  border-radius: 10px;
+  color: var(--text);
+  font-weight: 800;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.edition-option:hover span {
+  border-color: var(--crimson);
+  transform: translateY(-1px);
+}
+
+.edition-option input:checked + span {
+  border-color: var(--crimson);
+  background: var(--crimson);
+  color: #fff;
+  box-shadow: 2px 2px 0 var(--crimson-dark);
+}
+
+.edition-option input:focus-visible + span {
+  outline: 3px solid rgba(59, 110, 168, 0.35);
+  outline-offset: 2px;
+}
+
 /* Entrada breve del aviso emergente. */
 .toast {
   animation: in 0.2s ease-out;
