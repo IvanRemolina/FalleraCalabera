@@ -333,14 +333,16 @@ function renderSimulator() {
   if (!allPlayers.length) {
     $("#simulatorPlayerSelector").innerHTML = '<p class="text-sm text-[#766b5f]">Necesitas jugadores para simular la partida.</p>';
     $("#simulatorRuns").innerHTML = "";
+    const currentSummary = document.getElementById("simulatorSummary");
+    if (currentSummary) currentSummary.innerHTML = "";
     return;
   }
 
-  const selectedIds = new Set(
+  const defaults = new Set(allPlayers.slice(0, Math.min(4, allPlayers.length)).map((player) => player.id));
+  const previousSelection = new Set(
     [...document.querySelectorAll(".simulator-player-toggle:checked")].map((input) => input.value),
   );
-  const chosen = allPlayers.filter((player) => selectedIds.has(player.id));
-  const participants = chosen.length ? chosen : allPlayers.slice(0, Math.min(4, allPlayers.length));
+  const selectedIds = previousSelection.size ? previousSelection : defaults;
 
   $("#simulatorPlayerSelector").innerHTML = allPlayers
     .map(
@@ -350,7 +352,7 @@ function renderSimulator() {
             class="simulator-player-toggle"
             type="checkbox"
             value="${player.id}"
-            ${participants.some((item) => item.id === player.id) ? "checked" : ""}
+            ${selectedIds.has(player.id) ? "checked" : ""}
           />
           <span>${esc(player.name)}</span>
         </label>
@@ -358,15 +360,73 @@ function renderSimulator() {
     )
     .join("");
 
+  const updateSummary = (finalParticipants) => {
+    const results = [];
+    for (let runIndex = 0; runIndex < selectedCount; runIndex += 1) {
+      const winnerSelect = document.querySelector(`.simulator-winner[data-run="${runIndex}"]`);
+      const winnerId = winnerSelect?.value || finalParticipants[0]?.id;
+      const winnerIndex = finalParticipants.findIndex((player) => player.id === winnerId);
+
+      const ordered = simulateMatchElo(
+        finalParticipants.map((player, idx) => ({
+          ...player,
+          elo: Math.round(player.elo || 100),
+          isWinner: idx === winnerIndex,
+        })),
+      );
+
+      results.push({ runIndex, entries: ordered });
+    }
+
+    const summary = results
+      .map(
+        ({ runIndex, entries }) => `
+          <div class="rounded-xl border border-[#ddcdb8] p-4">
+            <p class="mb-3 text-sm font-bold text-coral">Resultado simulación ${runIndex + 1}</p>
+            ${entries
+              .map(
+                (entry) => `
+                  <div class="mb-2 flex items-center justify-between rounded-lg border border-[#eadfce] p-3">
+                    <div>
+                      <div class="font-bold">${esc(entry.name)}</div>
+                      <div class="text-xs text-[#766b5f]">Elo base: ${Math.round(entry.elo - entry.delta || entry.elo)}</div>
+                    </div>
+                    <div class="text-right">
+                      <div class="font-bold ${entry.delta >= 0 ? "text-coral" : "text-[#766b5f]"}">${entry.delta >= 0 ? "+" : ""}${entry.delta}</div>
+                      <div class="text-xs text-[#766b5f]">${entry.result === "gana" ? "Gana" : "Pierde"}</div>
+                    </div>
+                  </div>
+                `,
+              )
+              .join("")}
+          </div>
+        `,
+      )
+      .join("");
+
+    const currentSummary = document.getElementById("simulatorSummary");
+    if (currentSummary) currentSummary.innerHTML = summary;
+  };
+
   const updatePlayerSelection = () => {
     const selected = [...document.querySelectorAll(".simulator-player-toggle:checked")].map((input) => input.value);
     const nextParticipants = allPlayers.filter((player) => selected.includes(player.id));
     const finalParticipants = nextParticipants.length ? nextParticipants : allPlayers.slice(0, Math.min(2, allPlayers.length));
 
+    const currentWinners = {};
+    [...document.querySelectorAll(".simulator-winner")].forEach((select) => {
+      const runIndex = Number(select.dataset.run);
+      currentWinners[runIndex] = select.value;
+    });
+
     const runs = [];
     for (let runIndex = 0; runIndex < selectedCount; runIndex += 1) {
+      const fallbackWinner = finalParticipants[runIndex % finalParticipants.length]?.id || finalParticipants[0]?.id;
+      const selectedWinner = currentWinners[runIndex] && finalParticipants.some((player) => player.id === currentWinners[runIndex])
+        ? currentWinners[runIndex]
+        : fallbackWinner;
       const winnerOptions = finalParticipants
-        .map((player) => `<option value="${player.id}">${esc(player.name)}</option>`)
+        .map((player) => `<option value="${player.id}" ${player.id === selectedWinner ? "selected" : ""}>${esc(player.name)}</option>`)
         .join("");
 
       runs.push(`
@@ -399,70 +459,11 @@ function renderSimulator() {
     $("#simulatorRuns").innerHTML = runs.join("");
 
     [...document.querySelectorAll(".simulator-winner")].forEach((select) => {
-      const runIndex = Number(select.dataset.run);
-      const runPlayers = finalParticipants;
-      const winnerId = runPlayers[runIndex % runPlayers.length]?.id || runPlayers[0]?.id;
-      select.value = winnerId;
-      select.onchange = () => renderSimulator();
+      select.onchange = () => updateSummary(finalParticipants);
     });
 
-    const results = [];
-    for (let runIndex = 0; runIndex < selectedCount; runIndex += 1) {
-      const winnerSelect = document.querySelector(`.simulator-winner[data-run="${runIndex}"]`);
-      const winnerId = winnerSelect?.value || finalParticipants[0]?.id;
-      const winnerIndex = finalParticipants.findIndex((player) => player.id === winnerId);
-      const ordered = simulateMatchElo(
-        finalParticipants.map((player, idx) => ({
-          ...player,
-          elo: Math.round(player.elo || 100),
-          isWinner: idx === winnerIndex,
-        })),
-      );
-
-      results.push({
-        runIndex,
-        winnerId,
-        entries: ordered,
-      });
-    }
-
-    const summary = results
-      .map(
-        ({ runIndex, entries }) => `
-          <div class="rounded-xl border border-[#ddcdb8] p-4">
-            <p class="mb-3 text-sm font-bold text-coral">Resultado simulación ${runIndex + 1}</p>
-            ${entries
-              .map(
-                (entry) => `
-                  <div class="mb-2 flex items-center justify-between rounded-lg border border-[#eadfce] p-3">
-                    <div>
-                      <div class="font-bold">${esc(entry.name)}</div>
-                      <div class="text-xs text-[#766b5f]">Elo base: ${Math.round(entry.elo - entry.delta || entry.elo)}</div>
-                    </div>
-                    <div class="text-right">
-                      <div class="font-bold ${entry.delta >= 0 ? "text-coral" : "text-[#766b5f]"}">${entry.delta >= 0 ? "+" : ""}${entry.delta}</div>
-                      <div class="text-xs text-[#766b5f]">${entry.result === "gana" ? "Gana" : "Pierde"}</div>
-                    </div>
-                  </div>
-                `,
-              )
-              .join("")}
-          </div>
-        `,
-      )
-      .join("");
-
-    const currentSummary = document.getElementById("simulatorSummary");
-    if (currentSummary) {
-      currentSummary.innerHTML = summary;
-    }
+    updateSummary(finalParticipants);
   };
-
-  $("#simulatorRuns").innerHTML = "";
-  const summaryHost = document.getElementById("simulatorSummary");
-  if (summaryHost) {
-    summaryHost.innerHTML = "";
-  }
 
   [...document.querySelectorAll(".simulator-player-toggle")].forEach((input) => {
     input.onchange = updatePlayerSelection;
@@ -761,7 +762,7 @@ $("#newGameBtn").onclick = () => {
 $("#playerCount").onchange = participantInputs;
 $("#gameCountInput").onchange = winnerInputs;
 $("#participantFields").onchange = winnerInputs;
-$("#simulatorPlayerCount").onchange = renderSimulator;
+$("#simulatorSimulationCount").onchange = renderSimulator;
 $("#playerSortSelect").onchange = render;
 $("#evolutionStart").onchange = renderEvolution;
 $("#evolutionEnd").onchange = renderEvolution;
