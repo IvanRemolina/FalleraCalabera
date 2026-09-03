@@ -343,11 +343,11 @@ function deckInputs() {
   editionInputs();
 }
 
-function editionInputs() {
+function editionInputs(selectedEditions = [1]) {
   const deck = db.decks.find((item) => item.id === $("#deckSelect").value);
   const maxEdition = deck?.maxEdition || 0;
   $("#editionChecks").innerHTML = maxEdition
-    ? `<p class="mb-2 text-sm font-bold">Ediciones incluidas</p><div class="edition-options">${Array.from({ length: maxEdition }, (_, index) => `<label class="edition-option${index === 0 ? " edition-required" : ""}" title="${index === 0 ? "La edición 1 siempre está incluida" : `Seleccionar edición ${index + 1}`}" aria-label="${index === 0 ? "Edición 1, siempre incluida" : `Seleccionar edición ${index + 1}`}" ><input class="edition-check" type="checkbox" value="${index + 1}" ${index === 0 ? "checked disabled" : ""}/><span>${index + 1}</span></label>`).join("")}</div>`
+    ? `<p class="mb-2 text-sm font-bold">Ediciones incluidas</p><div class="edition-options">${Array.from({ length: maxEdition }, (_, index) => `<label class="edition-option${index === 0 ? " edition-required" : ""}" title="${index === 0 ? "La edición 1 siempre está incluida" : `Seleccionar edición ${index + 1}`}" aria-label="${index === 0 ? "Edición 1, siempre incluida" : `Seleccionar edición ${index + 1}`}" ><input class="edition-check" type="checkbox" value="${index + 1}" ${selectedEditions.includes(index + 1) ? "checked" : ""} ${index === 0 ? "disabled" : ""}/><span>${index + 1}</span></label>`).join("")}</div>`
     : '<p class="text-sm text-[#766b5f]">Selecciona una baraja</p>';
 }
 
