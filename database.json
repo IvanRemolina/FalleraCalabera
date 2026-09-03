@@ -14,10 +14,10 @@
       "id": "a7c96f2a-0d04-4440-a434-ba36fb0c9215",
       "name": "juan",
       "initialElo": 100,
-      "elo": 125,
-      "wins": 2,
+      "elo": 113,
+      "wins": 1,
       "losses": 0,
-      "games": 2,
+      "games": 1,
       "lastGame": "2026-09-03T13:20:12.822Z"
     },
     {
@@ -34,10 +34,10 @@
       "id": "ab787fe0-fd2f-474e-8058-250cccc93859",
       "name": "aa",
       "initialElo": 100,
-      "elo": 76,
+      "elo": 88,
       "wins": 0,
-      "losses": 2,
-      "games": 2,
+      "losses": 1,
+      "games": 1,
       "lastGame": "2026-09-03T13:20:12.822Z"
     }
   ],
@@ -45,14 +45,6 @@
     {
       "id": "b30dae65-40ed-451d-a438-a46d448ca326",
       "date": "2026-09-03T13:09:57.996Z",
-      "players": [
-        "a7c96f2a-0d04-4440-a434-ba36fb0c9215",
-        "ab787fe0-fd2f-474e-8058-250cccc93859"
-      ]
-    },
-    {
-      "id": "b42c08c8-8847-4ae1-81b2-e229f323737b",
-      "date": "2026-09-03T13:20:12.822Z",
       "players": [
         "a7c96f2a-0d04-4440-a434-ba36fb0c9215",
         "ab787fe0-fd2f-474e-8058-250cccc93859"
