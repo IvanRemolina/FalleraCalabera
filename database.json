@@ -4,31 +4,31 @@
       "id": "67c09732-9889-4122-afee-32f275f4d0b3",
       "name": "David Remolina",
       "initialElo": 140,
-      "elo": 140,
-      "wins": 0,
+      "elo": 158,
+      "wins": 1,
       "losses": 0,
-      "games": 0,
-      "lastGame": "2026-09-03T13:20:12.822Z"
+      "games": 1,
+      "lastGame": "2026-09-03T15:48:04.877Z"
     },
     {
       "id": "a7c96f2a-0d04-4440-a434-ba36fb0c9215",
       "name": "David Ramírez",
       "initialElo": 118,
-      "elo": 118,
+      "elo": 112,
       "wins": 0,
-      "losses": 0,
-      "games": 0,
-      "lastGame": "2026-09-03T13:20:12.822Z"
+      "losses": 1,
+      "games": 1,
+      "lastGame": "2026-09-03T15:48:04.877Z"
     },
     {
       "id": "09ca176c-5b7a-4ed0-aac7-719d72831700",
       "name": "Iván",
       "initialElo": 116,
-      "elo": 116,
+      "elo": 110,
       "wins": 0,
-      "losses": 0,
-      "games": 0,
-      "lastGame": "2026-09-03T13:20:12.822Z"
+      "losses": 1,
+      "games": 1,
+      "lastGame": "2026-09-03T15:48:04.877Z"
     },
     {
       "id": "ab787fe0-fd2f-474e-8058-250cccc93859",
@@ -53,10 +53,11 @@
       "id": "8b69ea21-161b-4151-800d-0472c0041924",
       "name": "Uriel",
       "initialElo": 135,
-      "elo": 135,
+      "elo": 128,
       "wins": 0,
-      "losses": 0,
-      "games": 0
+      "losses": 1,
+      "games": 1,
+      "lastGame": "2026-09-03T15:48:04.877Z"
     },
     {
       "id": "85c305b8-7871-4356-8b09-fae682145b5e",
@@ -95,7 +96,19 @@
       "games": 0
     }
   ],
-  "games": [],
+  "games": [
+    {
+      "id": "388314ed-560d-452d-bb5f-322d53cc1391",
+      "date": "2026-09-03T15:48:04.877Z",
+      "players": [
+        "67c09732-9889-4122-afee-32f275f4d0b3",
+        "09ca176c-5b7a-4ed0-aac7-719d72831700",
+        "a7c96f2a-0d04-4440-a434-ba36fb0c9215",
+        "8b69ea21-161b-4151-800d-0472c0041924"
+      ],
+      "deckId": "ea1fb23b-b868-44c6-9f78-6d752ce96302"
+    }
+  ],
   "decks": [
     {
       "id": "94e69f67-e02a-4bba-a425-3842be4f8397",
