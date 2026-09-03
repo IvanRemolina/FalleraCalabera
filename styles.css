@@ -5,29 +5,44 @@
   --crimson: #c8232c;
   --crimson-dark: #941b27;
   --gothic-black: #1e1e1e;
+  --surface: #fffaf0;
+  --surface-raised: #ffffff;
+  --text: #1e1e1e;
+  --ink-soft: #f4eadb;
+  --ink-muted: #665b4f;
+  --line: #d8c8ad;
+  --toast: #1e1e1e;
+}
+
+body.dark {
+  --surface: #28242a;
+  --surface-raised: #343039;
+  --text: #f4eadb;
   --ink-soft: #28242a;
   --ink-muted: #b9a990;
+  --line: #594465;
+  --toast: #101014;
 }
 
 /* Fondo oscuro con una trama sutil inspirada en el reverso de las cartas. */
 body {
-  background-color: var(--gothic-black);
+  background-color: var(--surface);
   background-image:
     linear-gradient(rgba(106, 76, 128, 0.08) 1px, transparent 1px),
     linear-gradient(90deg, rgba(59, 110, 168, 0.08) 1px, transparent 1px);
   background-size: 32px 32px;
-  color: var(--parchment);
+  color: var(--text);
 }
 
 /* Cabecera con el contraste del logotipo de la caja. */
 header {
-  background: rgba(30, 30, 30, 0.96) !important;
-  border-color: var(--card-purple) !important;
+  background: var(--surface) !important;
+  border-color: var(--line) !important;
 }
 
 /* Paneles oscuros con borde de carta y sombra carmesí. */
 .panel {
-  background: rgba(40, 36, 42, 0.96);
+  background: var(--surface);
   border: 1px solid var(--card-purple);
   box-shadow: 4px 4px 0 var(--crimson-dark);
 }
@@ -39,7 +54,7 @@ header {
 /* El morado y el azul sirven como familias visuales para navegación y tarjetas. */
 .tab.active {
   border-bottom: 3px solid var(--crimson);
-  color: var(--parchment) !important;
+  color: var(--crimson) !important;
 }
 
 .tab:hover,
@@ -119,9 +134,9 @@ button:hover {
 input,
 select {
   outline: none;
-  background-color: #f4e5c1 !important;
+  background-color: var(--surface-raised) !important;
   border-color: var(--card-blue) !important;
-  color: var(--gothic-black);
+  color: var(--text);
 }
 
 input:focus,
@@ -142,7 +157,7 @@ select:focus {
 
 [class*="text-[#24211e]"],
 [class*="text-ink"] {
-  color: var(--parchment) !important;
+  color: var(--text) !important;
 }
 
 [class*="border-[#ddcdb8]"],
@@ -153,12 +168,12 @@ select:focus {
 
 [class*="bg-[#fff8ed]"],
 [class*="bg-white"] {
-  background-color: var(--ink-soft) !important;
+  background-color: var(--surface-raised) !important;
 }
 
 [class*="bg-[#f4eadb]"] {
-  background-color: #343039 !important;
-  color: var(--ink-muted) !important;
+  background-color: var(--ink-soft) !important;
+  color: var(--text) !important;
 }
 
 [class*="border-[#eadfce]"] {
@@ -170,7 +185,12 @@ select:focus {
 }
 
 [class*="bg-[#24211e]"] {
-  background-color: var(--gothic-black) !important;
+  background-color: var(--toast) !important;
+}
+
+.theme-toggle {
+  border-color: var(--card-blue) !important;
+  color: var(--card-blue) !important;
 }
 
 /* Entrada breve del aviso emergente. */

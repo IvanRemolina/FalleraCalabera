@@ -1,6 +1,7 @@
 "use strict";
 const KEY = "fallera-elo-config",
   AUTH_KEY = "fallera-elo-authorized",
+  THEME_KEY = "fallera-elo-theme",
   API = "https://api.github.com/repos/";
 const DEFAULT_CONFIG = {
   owner: "IvanRemolina",
@@ -40,6 +41,18 @@ const config = () => ({
     JSON.parse(localStorage.getItem(KEY) || "null")?.token ||
     "",
 });
+
+function applyTheme(theme) {
+  const isDark = theme === "dark";
+  document.body.classList.toggle("dark", isDark);
+  const button = $("#themeToggle");
+  button.textContent = isDark ? "☀ Claro" : "☾ Oscuro";
+  button.title = isDark ? "Cambiar a modo claro" : "Cambiar a modo oscuro";
+  button.setAttribute("aria-pressed", String(isDark));
+}
+
+applyTheme(localStorage.getItem(THEME_KEY) || "light");
+
 function ensureAccess() {
   // Esta contraseña solo evita ediciones accidentales; no sustituye al token.
   if (localStorage.getItem(AUTH_KEY) === "yes") return true;
@@ -321,6 +334,12 @@ $("#settingsBtn").onclick = () => {
     (k) => ($("#gh" + k[0].toUpperCase() + k.slice(1)).value = c[k] || ""),
   );
   show("#settingsModal");
+};
+
+$("#themeToggle").onclick = () => {
+  const nextTheme = document.body.classList.contains("dark") ? "light" : "dark";
+  localStorage.setItem(THEME_KEY, nextTheme);
+  applyTheme(nextTheme);
 };
 
 $("#saveSettingsBtn").onclick = () => {

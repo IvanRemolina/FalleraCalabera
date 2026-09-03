@@ -37,13 +37,24 @@
           </p>
           <h1 class="font-display text-3xl font-bold">Elo de la colla</h1>
         </div>
-        <button
-          id="settingsBtn"
-          class="rounded-lg border border-[#cbb99f] px-3 py-2 text-sm font-semibold hover:bg-white"
-          title="Configuración"
-        >
-          ⚙ Configuración
-        </button>
+        <div class="flex items-center gap-2">
+          <button
+            id="themeToggle"
+            class="theme-toggle rounded-lg border border-[#cbb99f] px-3 py-2 text-sm font-semibold"
+            type="button"
+            aria-pressed="false"
+            title="Cambiar a modo oscuro"
+          >
+            ☾ Oscuro
+          </button>
+          <button
+            id="settingsBtn"
+            class="rounded-lg border border-[#cbb99f] px-3 py-2 text-sm font-semibold hover:bg-white"
+            title="Configuración"
+          >
+            ⚙ Configuración
+          </button>
+        </div>
       </div>
     </header>
     <main class="mx-auto max-w-6xl px-5 py-8">
