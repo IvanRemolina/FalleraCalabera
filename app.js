@@ -301,27 +301,20 @@ function renderEvolution() {
   $("#evolutionLegend").innerHTML = players.map((player, index) => `<span><i class="legend-dot" style="background:${colors[index % colors.length]}"></i>${esc(player.name)}</span>`).join("");
 }
 
-function expectedOutcome(elo, participantElos) {
-  const weights = participantElos.map((rating) => 10 ** (rating / 400));
-  return 10 ** (elo / 400) / weights.reduce((sum, weight) => sum + weight, 0);
-}
-
 function simulateMatchElo(participants) {
-  const total = participants.reduce((sum, player) => sum + 10 ** (player.elo / 400), 0);
-  const baseDelta = 25;
+  const participantElos = participants.map((player) => player.elo);
 
-  return participants.map((player, index) => {
-    const rivals = participants.filter((_, rivalIndex) => rivalIndex !== index).map((rival) => rival.elo);
-    const expected = expectedOutcome(player.elo, rivals.length ? rivals : [player.elo]);
-    const actual = index === 0 ? 1 : 0;
-    const rawDelta = baseDelta * (actual - expected);
-    const roundedDelta = Math.round(rawDelta);
-    const finalDelta = Math.abs(roundedDelta) < 1 ? (actual ? 1 : -1) : roundedDelta;
+  return participants.map((player) => {
+    const probability = expected(player.elo, participantElos);
+    const actual = player.isWinner ? 1 : 0;
+    const change = 25 * (actual - probability);
+    const newElo = applyEloChange(player.elo, change);
+    const finalDelta = newElo - player.elo;
     return {
       ...player,
       delta: finalDelta,
-      newElo: player.elo + finalDelta,
-      result: index === 0 ? "gana" : "pierde",
+      newElo,
+      result: player.isWinner ? "gana" : "pierde",
     };
   });
 }
