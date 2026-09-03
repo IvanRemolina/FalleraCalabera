@@ -361,14 +361,36 @@ function deckInputs() {
         .join("")}`
     : '<option value="">Sin barajas: añade una primero</option>';
   $("#deckSelect").disabled = !db.decks.length;
-  editionInputs();
+
+  if (db.decks.length === 1) {
+    $("#deckSelect").value = db.decks[0].id;
+  }
+
+  editionInputs([1]);
 }
 
 function editionInputs(selectedEditions = [1]) {
-  const deck = db.decks.find((item) => item.id === $("#deckSelect").value);
+  const deckId = $("#deckSelect").value;
+  const deck = db.decks.find((item) => item.id === deckId);
   const maxEdition = deck?.maxEdition || 0;
+
+  const rawSelection = Array.isArray(selectedEditions)
+    ? selectedEditions
+    : [1];
+  const selectedSet = new Set(
+    rawSelection
+      .map((value) => Number(value))
+      .filter((value) => Number.isInteger(value) && value >= 1 && value <= maxEdition),
+  );
+
+  if (maxEdition > 0) selectedSet.add(1);
+
   $("#editionChecks").innerHTML = maxEdition
-    ? `<p class="mb-2 text-sm font-bold">Ediciones incluidas</p><div class="edition-options">${Array.from({ length: maxEdition }, (_, index) => `<label class="edition-option${index === 0 ? " edition-required" : ""}" title="${index === 0 ? "La edición 1 siempre está incluida" : `Seleccionar edición ${index + 1}`}" aria-label="${index === 0 ? "Edición 1, siempre incluida" : `Seleccionar edición ${index + 1}`}" ><input class="edition-check" type="checkbox" value="${index + 1}" ${selectedEditions.includes(index + 1) ? "checked" : ""} ${index === 0 ? "disabled" : ""}/><span>${index + 1}</span></label>`).join("")}</div>`
+    ? `<p class="mb-2 text-sm font-bold">Ediciones incluidas</p><div class="edition-options">${Array.from({ length: maxEdition }, (_, index) => {
+        const edition = index + 1;
+        const required = edition === 1;
+        return `<label class="edition-option${required ? " edition-required" : ""}" title="${required ? "La edición 1 siempre está incluida" : `Seleccionar edición ${edition}`}" aria-label="${required ? "Edición 1, siempre incluida" : `Seleccionar edición ${edition}`}" ><input class="edition-check" type="checkbox" value="${edition}" ${selectedSet.has(edition) ? "checked" : ""} ${required ? "checked disabled" : ""}/><span>${edition}</span></label>`;
+      }).join("")}</div>`
     : '<p class="text-sm text-[#766b5f]">Selecciona una baraja</p>';
 }
 
@@ -646,7 +668,7 @@ function openDeckModal() {
 }
 $("#addDeckBtn").onclick = openDeckModal;
 $("#manageDeckBtn").onclick = openDeckModal;
-$("#deckSelect").onchange = editionInputs;
+$("#deckSelect").onchange = () => editionInputs([1]);
 $("#saveDeckBtn").onclick = async () => {
   if (!ensureCanEdit()) return;
   const name = $("#deckName").value.trim();
