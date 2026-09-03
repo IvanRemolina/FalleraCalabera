@@ -14,10 +14,10 @@
       "id": "a7c96f2a-0d04-4440-a434-ba36fb0c9215",
       "name": "David Ramírez",
       "initialElo": 118,
-      "elo": 98,
+      "elo": 108,
       "wins": 0,
-      "losses": 2,
-      "games": 2,
+      "losses": 1,
+      "games": 1,
       "lastGame": "2026-09-03T21:16:33.619Z"
     },
     {
@@ -84,20 +84,20 @@
       "id": "599cd206-6510-438a-8fc1-b7b3c2181add",
       "name": "Cristian",
       "initialElo": 77,
-      "elo": 68,
+      "elo": 76,
       "wins": 1,
-      "losses": 3,
-      "games": 4,
+      "losses": 2,
+      "games": 3,
       "lastGame": "2026-09-03T21:16:33.619Z"
     },
     {
       "id": "b050d3d8-995e-4c37-a3d2-26fb2351cb3d",
       "name": "Angelo",
       "initialElo": 37,
-      "elo": 74,
-      "wins": 2,
+      "elo": 56,
+      "wins": 1,
       "losses": 0,
-      "games": 2,
+      "games": 1,
       "lastGame": "2026-09-03T21:16:33.619Z"
     }
   ],
@@ -156,19 +156,6 @@
     {
       "id": "f5f58e8f-2383-4ebf-8e5e-3989af6b01c8",
       "date": "2026-09-03T21:16:33.618Z",
-      "players": [
-        "b050d3d8-995e-4c37-a3d2-26fb2351cb3d",
-        "599cd206-6510-438a-8fc1-b7b3c2181add",
-        "a7c96f2a-0d04-4440-a434-ba36fb0c9215"
-      ],
-      "deckId": "f499035f-48a7-44b5-a851-6207604ff52f",
-      "editions": [
-        1
-      ]
-    },
-    {
-      "id": "7953eb02-6004-42bd-b4f7-b315d2b525b5",
-      "date": "2026-09-03T21:16:33.619Z",
       "players": [
         "b050d3d8-995e-4c37-a3d2-26fb2351cb3d",
         "599cd206-6510-438a-8fc1-b7b3c2181add",
