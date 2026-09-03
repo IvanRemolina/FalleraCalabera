@@ -5,6 +5,7 @@ Clasificación Elo para partidas de **La Fallera Calavera**. La aplicación perm
 ## Funciones
 
 - Tabla de clasificación con Elo, victorias, derrotas, porcentaje de victorias y partidas jugadas.
+- Gráfico de evolución del Elo por jugador, con puntos interactivos y filtro por fechas.
 - Registro de partidas de 2 a 6 jugadores, ordenadas por puesto.
 - Catálogo de barajas y versiones, independiente del Elo común.
 - Historial de partidas con opción de eliminar resultados.
@@ -15,15 +16,17 @@ Clasificación Elo para partidas de **La Fallera Calavera**. La aplicación perm
 
 ## Uso local
 
-El proyecto no necesita compilación ni dependencias de Node.js. Sirve los archivos desde cualquier servidor estático. Por ejemplo:
-
-```bash
-python3 -m http.server 8000
-```
-
 Después, abre <http://localhost:8000> en el navegador.
 
 También puedes publicar directamente los archivos `index.html`, `styles.css` y `app.js` en un servicio de hosting estático.
+
+## Evolución del Elo
+
+En la pestaña **Evolución** se muestra una línea por jugador y un punto después de
+cada partida. Al pasar el cursor sobre un punto se muestra el nombre y el Elo de
+ese momento. Sin fechas seleccionadas se incluye todo el historial. El filtro de
+inicio incluye el día desde las `00:00` y el filtro de fin lo incluye hasta las
+`23:59:59.999`, por lo que se pueden consultar días completos.
 
 ## Configurar GitHub
 

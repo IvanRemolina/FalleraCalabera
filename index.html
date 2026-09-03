@@ -80,7 +80,8 @@
         ><button class="tab pb-3" data-view="history">
           Historial <span id="gameCount"></span></button
         ><button class="tab pb-3" data-view="players">Jugadores</button
-        ><button class="tab pb-3" data-view="decks">Barajas</button>
+        ><button class="tab pb-3" data-view="decks">Barajas</button
+        ><button class="tab pb-3" data-view="evolution">Evolución</button>
       </nav>
       <section id="rankingView">
         <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
@@ -169,6 +170,25 @@
         </div>
         <div id="decksBody" class="grid gap-3 sm:grid-cols-2"></div>
       </section>
+      <section id="evolutionView" class="hidden">
+        <div class="mb-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p class="text-sm text-[#766b5f]">Progreso del Elo</p>
+            <h2 class="font-display text-2xl font-bold">Evolución de jugadores</h2>
+          </div>
+          <div class="flex flex-wrap gap-3">
+            <label class="text-sm font-bold">Fecha de inicio<input id="evolutionStart" type="date" class="mt-1 block rounded-lg border p-2" /></label>
+            <label class="text-sm font-bold">Fecha de fin<input id="evolutionEnd" type="date" class="mt-1 block rounded-lg border p-2" /></label>
+          </div>
+        </div>
+        <div class="panel overflow-x-auto rounded-xl p-4">
+          <div class="min-w-[640px]">
+            <svg id="evolutionChart" class="h-[360px] w-full" role="img" aria-label="Evolución del Elo por partidas"></svg>
+            <div id="evolutionLegend" class="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm"></div>
+          </div>
+          <p id="emptyEvolution" class="hidden py-12 text-center text-[#766b5f]">No hay partidas en el periodo seleccionado.</p>
+        </div>
+      </section>
     </main>
     <div
       id="gameModal"
@@ -226,6 +246,7 @@
         </button>
       </div>
     </div>
+    <div id="chartTooltip" class="pointer-events-none fixed z-30 hidden rounded-lg bg-[#24211e] px-3 py-2 text-xs text-white shadow-lg"></div>
     <div
       id="deckModal"
       class="modal fixed inset-0 z-20 hidden items-center justify-center p-4"

@@ -193,6 +193,30 @@ select:focus {
   color: var(--card-blue) !important;
 }
 
+.chart-grid {
+  stroke: var(--line);
+  stroke-dasharray: 3 5;
+}
+
+.chart-label {
+  fill: var(--ink-muted);
+  font-size: 12px;
+}
+
+.chart-point {
+  cursor: pointer;
+  stroke: var(--surface-raised);
+  stroke-width: 2px;
+}
+
+.legend-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 6px;
+  border-radius: 50%;
+}
+
 /* Entrada breve del aviso emergente. */
 .toast {
   animation: in 0.2s ease-out;

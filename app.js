@@ -190,6 +190,91 @@ function sortPlayers(players, mode = "alphabetic") {
   }
 }
 
+function evolutionSnapshots() {
+  const players = new Map(
+    db.players.map((player) => [player.id, { ...player, elo: player.initialElo }]),
+  );
+  const snapshots = [
+    { date: null, ratings: new Map([...players].map(([id, player]) => [id, player.elo])) },
+  ];
+
+  for (const game of [...db.games].sort((a, b) => new Date(a.date) - new Date(b.date))) {
+    const ratings = new Map([...players].map(([id, player]) => [id, player.elo]));
+    const participantElos = game.players.map((id) => ratings.get(id) ?? 1000);
+    const changes = [];
+    game.players.forEach((id, place) => {
+      const player = players.get(id);
+      if (!player) return;
+      const probability = expected(ratings.get(id) ?? player.elo, participantElos);
+      changes.push([player, 25 * ((place === 0 ? 1 : 0) - probability)]);
+    });
+    changes.forEach(([player, change]) => {
+      player.elo = applyEloChange(ratings.get(player.id) ?? player.elo, change);
+    });
+    snapshots.push({
+      date: game.date,
+      ratings: new Map([...players].map(([id, player]) => [id, player.elo])),
+    });
+  }
+  return snapshots;
+}
+
+function renderEvolution() {
+  const chart = $("#evolutionChart");
+  if (!chart) return;
+  const startValue = $("#evolutionStart").value;
+  const endValue = $("#evolutionEnd").value;
+  const start = startValue ? new Date(`${startValue}T00:00:00`) : null;
+  const end = endValue ? new Date(`${endValue}T23:59:59.999`) : null;
+  const allSnapshots = evolutionSnapshots();
+  const gameIndexes = allSnapshots
+    .map((snapshot, index) => ({ snapshot, index }))
+    .filter(
+      ({ snapshot }) =>
+        snapshot.date &&
+        (!start || new Date(snapshot.date) >= start) &&
+        (!end || new Date(snapshot.date) <= end),
+    )
+    .map(({ index }) => index);
+  const snapshots = gameIndexes.length
+    ? [allSnapshots[gameIndexes[0] - 1], ...gameIndexes.map((index) => allSnapshots[index])]
+    : [];
+  const players = db.players;
+  const width = 900;
+  const height = 360;
+  const padding = { top: 24, right: 24, bottom: 42, left: 52 };
+  const colors = ["#c8232c", "#3b6ea8", "#6a4c80", "#b18435", "#23806a", "#d05c2e"];
+  chart.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  const hasGamesInRange = snapshots.some((snapshot) => snapshot.date);
+  if (!players.length || !hasGamesInRange) {
+    chart.innerHTML = "";
+    $("#evolutionLegend").innerHTML = "";
+    $("#emptyEvolution").classList.remove("hidden");
+    return;
+  }
+  $("#emptyEvolution").classList.add("hidden");
+  const values = snapshots.flatMap((snapshot) => [...snapshot.ratings.values()]);
+  const minimum = Math.floor(Math.min(...values) / 10) * 10;
+  const maximum = Math.ceil(Math.max(...values) / 10) * 10 || minimum + 10;
+  const plotWidth = width - padding.left - padding.right;
+  const plotHeight = height - padding.top - padding.bottom;
+  const x = (index) => padding.left + (snapshots.length === 1 ? plotWidth / 2 : (index / (snapshots.length - 1)) * plotWidth);
+  const y = (value) => padding.top + ((maximum - value) / Math.max(1, maximum - minimum)) * plotHeight;
+  const grid = [0, 0.5, 1].map((fraction) => {
+    const value = Math.round(maximum - fraction * (maximum - minimum));
+    const position = y(value);
+    return `<line x1="${padding.left}" y1="${position}" x2="${width - padding.right}" y2="${position}" class="chart-grid"/><text x="${padding.left - 10}" y="${position + 4}" text-anchor="end" class="chart-label">${value}</text>`;
+  }).join("");
+  const lines = players.map((player, playerIndex) => {
+    const color = colors[playerIndex % colors.length];
+    const points = snapshots.map((snapshot, index) => `${x(index)},${y(snapshot.ratings.get(player.id) ?? player.initialElo)}`).join(" ");
+    const dots = snapshots.map((snapshot, index) => `<circle cx="${x(index)}" cy="${y(snapshot.ratings.get(player.id) ?? player.initialElo)}" r="4" fill="${color}" class="chart-point" data-player="${esc(player.name)}" data-elo="${snapshot.ratings.get(player.id) ?? player.initialElo}" data-date="${snapshot.date || "Inicio"}"/>`).join("");
+    return `<polyline points="${points}" fill="none" stroke="${color}" stroke-width="2"/>${dots}`;
+  }).join("");
+  chart.innerHTML = `${grid}${lines}`;
+  $("#evolutionLegend").innerHTML = players.map((player, index) => `<span><i class="legend-dot" style="background:${colors[index % colors.length]}"></i>${esc(player.name)}</span>`).join("");
+}
+
 function render() {
   recalculate();
   const ranked = [...db.players].sort(
@@ -241,6 +326,7 @@ function render() {
         `<article class="panel flex items-center justify-between rounded-xl p-4"><div><b>${esc(deckLabel(deck))}</b><p class="text-sm text-[#766b5f]">${db.games.filter((game) => game.deckId === deck.id).length} partidas</p></div><button class="deleteDeck text-sm font-bold text-[#b84339]" data-id="${deck.id}">Eliminar</button></article>`,
     )
     .join("");
+  renderEvolution();
 }
 
 function deckInputs() {
@@ -435,6 +521,8 @@ $("#newGameBtn").onclick = () => {
 };
 $("#playerCount").onchange = participantInputs;
 $("#playerSortSelect").onchange = render;
+$("#evolutionStart").onchange = renderEvolution;
+$("#evolutionEnd").onchange = renderEvolution;
 $("#saveGameBtn").onclick = async () => {
   if (!ensureCanEdit()) return;
   const ids = [...document.querySelectorAll(".participant")].map((x) => x.value.trim());
@@ -524,7 +612,7 @@ document.addEventListener("click", async (e) => {
       .querySelectorAll(".tab")
       .forEach((x) => x.classList.remove("active"));
     tab.classList.add("active");
-    ["ranking", "history", "players", "decks"].forEach((v) =>
+    ["ranking", "history", "players", "decks", "evolution"].forEach((v) =>
       $("#" + v + "View").classList.toggle("hidden", v !== tab.dataset.view),
     );
   }
@@ -573,6 +661,24 @@ document.addEventListener("click", async (e) => {
     render();
     await persist("Eliminar baraja");
   }
+});
+document.addEventListener("pointerover", (e) => {
+  const point = e.target.closest(".chart-point");
+  if (!point) return;
+  const tooltip = $("#chartTooltip");
+  tooltip.innerHTML = `<b>${point.dataset.player}</b><br>${point.dataset.elo} Elo<br><span>${point.dataset.date === "Inicio" ? "Inicio" : dateText(point.dataset.date)}</span>`;
+  tooltip.classList.remove("hidden");
+  tooltip.style.left = `${e.clientX + 12}px`;
+  tooltip.style.top = `${e.clientY + 12}px`;
+});
+document.addEventListener("pointermove", (e) => {
+  if (!e.target.closest(".chart-point")) return;
+  const tooltip = $("#chartTooltip");
+  tooltip.style.left = `${e.clientX + 12}px`;
+  tooltip.style.top = `${e.clientY + 12}px`;
+});
+document.addEventListener("pointerout", (e) => {
+  if (e.target.closest(".chart-point")) $("#chartTooltip").classList.add("hidden");
 });
 loadRemote();
 if (config().token) startAutoSync();
