@@ -4,31 +4,31 @@
       "id": "67c09732-9889-4122-afee-32f275f4d0b3",
       "name": "David Remolina",
       "initialElo": 140,
-      "elo": 140,
+      "elo": 135,
       "wins": 0,
-      "losses": 0,
-      "games": 0,
-      "lastGame": "2026-09-03T15:48:04.877Z"
+      "losses": 1,
+      "games": 1,
+      "lastGame": "2026-09-03T20:59:58.782Z"
     },
     {
       "id": "a7c96f2a-0d04-4440-a434-ba36fb0c9215",
       "name": "David Ramírez",
       "initialElo": 118,
-      "elo": 118,
+      "elo": 114,
       "wins": 0,
-      "losses": 0,
-      "games": 0,
-      "lastGame": "2026-09-03T15:48:04.877Z"
+      "losses": 1,
+      "games": 1,
+      "lastGame": "2026-09-03T20:59:58.782Z"
     },
     {
       "id": "09ca176c-5b7a-4ed0-aac7-719d72831700",
       "name": "Iván",
       "initialElo": 116,
-      "elo": 139,
-      "wins": 2,
+      "elo": 159,
+      "wins": 3,
       "losses": 1,
-      "games": 3,
-      "lastGame": "2026-09-03T20:59:25.397Z"
+      "games": 4,
+      "lastGame": "2026-09-03T20:59:58.782Z"
     },
     {
       "id": "ab787fe0-fd2f-474e-8058-250cccc93859",
@@ -54,11 +54,11 @@
       "id": "8b69ea21-161b-4151-800d-0472c0041924",
       "name": "Uriel",
       "initialElo": 135,
-      "elo": 122,
+      "elo": 118,
       "wins": 0,
-      "losses": 1,
-      "games": 1,
-      "lastGame": "2026-09-03T20:59:25.397Z"
+      "losses": 2,
+      "games": 2,
+      "lastGame": "2026-09-03T20:59:58.782Z"
     },
     {
       "id": "85c305b8-7871-4356-8b09-fae682145b5e",
@@ -84,20 +84,21 @@
       "id": "599cd206-6510-438a-8fc1-b7b3c2181add",
       "name": "Cristian",
       "initialElo": 77,
-      "elo": 84,
+      "elo": 80,
       "wins": 1,
-      "losses": 1,
-      "games": 2,
-      "lastGame": "2026-09-03T20:57:59.493Z"
+      "losses": 2,
+      "games": 3,
+      "lastGame": "2026-09-03T20:59:58.782Z"
     },
     {
       "id": "b050d3d8-995e-4c37-a3d2-26fb2351cb3d",
       "name": "Angelo",
       "initialElo": 37,
-      "elo": 37,
+      "elo": 34,
       "wins": 0,
-      "losses": 0,
-      "games": 0
+      "losses": 1,
+      "games": 1,
+      "lastGame": "2026-09-03T20:59:58.782Z"
     }
   ],
   "games": [
@@ -150,6 +151,24 @@
       "deckId": "f499035f-48a7-44b5-a851-6207604ff52f",
       "editions": [
         1
+      ]
+    },
+    {
+      "id": "6d96de0a-c447-48d1-b5a6-9723b843f864",
+      "date": "2026-09-03T20:59:58.782Z",
+      "players": [
+        "09ca176c-5b7a-4ed0-aac7-719d72831700",
+        "b050d3d8-995e-4c37-a3d2-26fb2351cb3d",
+        "599cd206-6510-438a-8fc1-b7b3c2181add",
+        "a7c96f2a-0d04-4440-a434-ba36fb0c9215",
+        "67c09732-9889-4122-afee-32f275f4d0b3",
+        "8b69ea21-161b-4151-800d-0472c0041924"
+      ],
+      "deckId": "0d0a650c-39f4-4cd2-a440-e3b62ff7acd4",
+      "editions": [
+        1,
+        2,
+        3
       ]
     }
   ],
