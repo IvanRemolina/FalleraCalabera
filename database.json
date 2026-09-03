@@ -97,5 +97,11 @@
     }
   ],
   "games": [],
-  "decks": []
+  "decks": [
+    {
+      "id": "f499035f-48a7-44b5-a851-6207604ff52f",
+      "name": "Fallera Original",
+      "maxEdition": 4
+    }
+  ]
 }
