@@ -326,16 +326,13 @@ function renderSimulator() {
   if (!allPlayers.length) {
     $("#simulatorPlayerSelector").innerHTML = '<p class="text-sm text-[#766b5f]">Necesitas jugadores para simular la partida.</p>';
     $("#simulatorRuns").innerHTML = "";
-    const currentSummary = document.getElementById("simulatorSummary");
-    if (currentSummary) currentSummary.innerHTML = "";
     return;
   }
 
-  const defaults = new Set(allPlayers.slice(0, Math.min(4, allPlayers.length)).map((player) => player.id));
   const previousSelection = new Set(
     [...document.querySelectorAll(".simulator-player-toggle:checked")].map((input) => input.value),
   );
-  const selectedIds = previousSelection.size ? previousSelection : defaults;
+  const selectedIds = previousSelection;
 
   $("#simulatorPlayerSelector").innerHTML = allPlayers
     .map(
@@ -353,58 +350,10 @@ function renderSimulator() {
     )
     .join("");
 
-  const updateSummary = (finalParticipants) => {
-    const results = [];
-    for (let runIndex = 0; runIndex < selectedCount; runIndex += 1) {
-      const winnerSelect = document.querySelector(`.simulator-winner[data-run="${runIndex}"]`);
-      const winnerId = winnerSelect?.value || finalParticipants[0]?.id;
-      const winnerIndex = finalParticipants.findIndex((player) => player.id === winnerId);
-
-      const ordered = simulateMatchElo(
-        finalParticipants.map((player, idx) => ({
-          ...player,
-          elo: Math.round(player.elo || 100),
-          isWinner: idx === winnerIndex,
-        })),
-      );
-
-      results.push({ runIndex, entries: ordered });
-    }
-
-    const summary = results
-      .map(
-        ({ runIndex, entries }) => `
-          <div class="rounded-xl border border-[#ddcdb8] p-4">
-            <p class="mb-3 text-sm font-bold text-coral">Resultado simulación ${runIndex + 1}</p>
-            ${entries
-              .map(
-                (entry) => `
-                  <div class="mb-2 flex items-center justify-between rounded-lg border border-[#eadfce] p-3">
-                    <div>
-                      <div class="font-bold">${esc(entry.name)}</div>
-                      <div class="text-xs text-[#766b5f]">Elo base: ${Math.round(entry.elo - entry.delta || entry.elo)}</div>
-                    </div>
-                    <div class="text-right">
-                      <div class="font-bold ${entry.delta >= 0 ? "text-coral" : "text-[#766b5f]"}">${entry.delta >= 0 ? "+" : ""}${entry.delta}</div>
-                      <div class="text-xs text-[#766b5f]">${entry.result === "gana" ? "Gana" : "Pierde"}</div>
-                    </div>
-                  </div>
-                `,
-              )
-              .join("")}
-          </div>
-        `,
-      )
-      .join("");
-
-    const currentSummary = document.getElementById("simulatorSummary");
-    if (currentSummary) currentSummary.innerHTML = summary;
-  };
-
   const updatePlayerSelection = () => {
     const selected = [...document.querySelectorAll(".simulator-player-toggle:checked")].map((input) => input.value);
     const nextParticipants = allPlayers.filter((player) => selected.includes(player.id));
-    const finalParticipants = nextParticipants.length ? nextParticipants : allPlayers.slice(0, Math.min(2, allPlayers.length));
+    const finalParticipants = nextParticipants;
 
     const currentWinners = {};
     [...document.querySelectorAll(".simulator-winner")].forEach((select) => {
@@ -430,32 +379,53 @@ function renderSimulator() {
               ${winnerOptions}
             </select>
           </label>
-          <div class="mt-3 space-y-2">
-            ${finalParticipants
-              .map(
-                (player) => `
-                  <div class="flex items-center justify-between rounded-lg border border-[#eadfce] p-3">
-                    <div>
-                      <div class="font-bold">${esc(player.name)}</div>
-                      <div class="text-xs text-[#766b5f]">Elo base: ${Math.round(player.elo || 100)}</div>
-                    </div>
-                    <div class="text-xs font-bold text-[#766b5f]">—</div>
-                  </div>
-                `,
-              )
-              .join("")}
-          </div>
+          <div class="mt-3 space-y-2" data-simulation-players="${runIndex}"></div>
         </div>
       `);
     }
 
     $("#simulatorRuns").innerHTML = runs.join("");
 
+    if (!finalParticipants.length) {
+      $("#simulatorRuns").innerHTML = '<p class="text-sm text-[#766b5f]">Selecciona al menos dos jugadores para simular una partida.</p>';
+      return;
+    }
+
     [...document.querySelectorAll(".simulator-winner")].forEach((select) => {
-      select.onchange = () => updateSummary(finalParticipants);
+      select.onchange = updatePlayerSelection;
     });
 
-    updateSummary(finalParticipants);
+    for (let runIndex = 0; runIndex < selectedCount; runIndex += 1) {
+      const winnerSelect = document.querySelector(`.simulator-winner[data-run="${runIndex}"]`);
+      const winnerIndex = finalParticipants.findIndex((player) => player.id === winnerSelect?.value);
+      const entries = simulateMatchElo(
+        finalParticipants.map((player, index) => ({
+          ...player,
+          elo: Math.round(player.elo || 100),
+          isWinner: index === winnerIndex,
+        })),
+      );
+      const playersHost = document.querySelector(`[data-simulation-players="${runIndex}"]`);
+      if (playersHost) {
+        playersHost.innerHTML = entries
+          .map(
+            (entry) => `
+              <div class="flex items-center justify-between rounded-lg border border-[#eadfce] p-3">
+                <div>
+                  <div class="font-bold">${esc(entry.name)}</div>
+                  <div class="text-xs text-[#766b5f]">Elo base: ${entry.elo}</div>
+                </div>
+                <div class="text-right">
+                  <div class="font-bold ${entry.delta >= 0 ? "text-coral" : "text-[#766b5f]"}">${entry.delta >= 0 ? "+" : ""}${entry.delta}</div>
+                  <div class="text-xs text-[#766b5f]">${entry.result === "gana" ? "Gana" : "Pierde"}</div>
+                </div>
+              </div>
+            `,
+          )
+          .join("");
+      }
+    }
+
   };
 
   [...document.querySelectorAll(".simulator-player-toggle")].forEach((input) => {
