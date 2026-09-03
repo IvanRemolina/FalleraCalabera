@@ -1,48 +1,183 @@
-/* Base de la página y textura de fondo. */
+:root {
+  --card-purple: #6a4c80;
+  --card-blue: #3b6ea8;
+  --parchment: #e6c687;
+  --crimson: #c8232c;
+  --crimson-dark: #941b27;
+  --gothic-black: #1e1e1e;
+  --ink-soft: #28242a;
+  --ink-muted: #b9a990;
+}
+
+/* Fondo oscuro con una trama sutil inspirada en el reverso de las cartas. */
 body {
-  background: #f4eadb;
-  color: #24211e;
-  background-image: radial-gradient(#d6c7b1 1px, transparent 1px);
-  background-size: 22px 22px;
+  background-color: var(--gothic-black);
+  background-image:
+    linear-gradient(rgba(106, 76, 128, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59, 110, 168, 0.08) 1px, transparent 1px);
+  background-size: 32px 32px;
+  color: var(--parchment);
 }
 
-/* Paneles con el estilo visual común de la aplicación. */
+/* Cabecera con el contraste del logotipo de la caja. */
+header {
+  background: rgba(30, 30, 30, 0.96) !important;
+  border-color: var(--card-purple) !important;
+}
+
+/* Paneles oscuros con borde de carta y sombra carmesí. */
 .panel {
-  background: rgba(255, 248, 237, 0.94);
-  border: 1px solid #ddcdb8;
-  box-shadow: 4px 4px 0 #d7c2a8;
+  background: rgba(40, 36, 42, 0.96);
+  border: 1px solid var(--card-purple);
+  box-shadow: 4px 4px 0 var(--crimson-dark);
 }
 
-/* Estado activo de las pestañas. */
+.panel:hover {
+  border-color: var(--parchment);
+}
+
+/* El morado y el azul sirven como familias visuales para navegación y tarjetas. */
 .tab.active {
-  color: #c74438;
-  border-bottom: 3px solid #e95d4f;
+  border-bottom: 3px solid var(--crimson);
+  color: var(--parchment) !important;
 }
 
-.rank {
-  font-family: Georgia, serif;
+.tab:hover,
+.text-coral,
+.rank,
+.text-coral:hover {
+  color: var(--crimson) !important;
 }
 
-/* Fondo y campos de los cuadros de diálogo. */
-.modal {
-  background: rgba(36, 33, 30, 0.55);
+#playersBody .panel:nth-child(4n + 1),
+#decksBody .panel:nth-child(4n + 1) {
+  border-left: 4px solid var(--card-purple);
 }
+
+#playersBody .panel:nth-child(4n + 2),
+#decksBody .panel:nth-child(4n + 2) {
+  border-left: 4px solid var(--card-blue);
+}
+
+#playersBody .panel:nth-child(4n + 3),
+#decksBody .panel:nth-child(4n + 3) {
+  border-left: 4px solid var(--parchment);
+}
+
+#playersBody .panel:nth-child(4n + 4),
+#decksBody .panel:nth-child(4n + 4) {
+  border-left: 4px solid var(--crimson);
+}
+
+#rankingBody tr:nth-child(4n + 1) .rank {
+  color: var(--card-purple) !important;
+}
+
+#rankingBody tr:nth-child(4n + 2) .rank {
+  color: var(--card-blue) !important;
+}
+
+#rankingBody tr:nth-child(4n + 3) .rank {
+  color: var(--parchment) !important;
+}
+
+#rankingBody tr:nth-child(4n + 4) .rank {
+  color: var(--crimson) !important;
+}
+
+/* Acciones principales en el rojo de la caja. */
+#newGameBtn,
+#saveGameBtn,
+#savePlayerBtn,
+#saveDeckBtn,
+#saveSettingsBtn {
+  background-color: var(--crimson) !important;
+  box-shadow: 3px 3px 0 var(--crimson-dark);
+}
+
+#newGameBtn:hover,
+#saveGameBtn:hover,
+#savePlayerBtn:hover,
+#saveDeckBtn:hover,
+#saveSettingsBtn:hover {
+  background-color: #e03a43 !important;
+}
+
+button {
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+button:hover {
+  border-color: var(--parchment);
+}
+
+/* El azul distingue los controles editables y el pergamino mantiene la lectura. */
 input,
 select {
   outline: none;
+  background-color: #f4e5c1 !important;
+  border-color: var(--card-blue) !important;
+  color: var(--gothic-black);
 }
 
-/* Realce de foco para navegación con teclado. */
 input:focus,
 select:focus {
-  border-color: #e95d4f;
-  box-shadow: 0 0 0 3px #e95d4f22;
+  border-color: var(--parchment) !important;
+  box-shadow: 0 0 0 3px rgba(230, 198, 135, 0.28);
+}
+
+/* Fondo de los cuadros de diálogo. */
+.modal {
+  background: rgba(10, 10, 12, 0.82);
+}
+
+/* Compatibilidad visual para las utilidades antiguas del marcado Tailwind. */
+[class*="text-[#766b5f]"] {
+  color: var(--ink-muted) !important;
+}
+
+[class*="text-[#24211e]"],
+[class*="text-ink"] {
+  color: var(--parchment) !important;
+}
+
+[class*="border-[#ddcdb8]"],
+[class*="border-[#cbb99f]"],
+[class*="border-coral"] {
+  border-color: var(--card-purple) !important;
+}
+
+[class*="bg-[#fff8ed]"],
+[class*="bg-white"] {
+  background-color: var(--ink-soft) !important;
+}
+
+[class*="bg-[#f4eadb]"] {
+  background-color: #343039 !important;
+  color: var(--ink-muted) !important;
+}
+
+[class*="border-[#eadfce]"] {
+  border-color: rgba(106, 76, 128, 0.45) !important;
+}
+
+[class*="text-[#b84339]"] {
+  color: #ef6970 !important;
+}
+
+[class*="bg-[#24211e]"] {
+  background-color: var(--gothic-black) !important;
 }
 
 /* Entrada breve del aviso emergente. */
 .toast {
   animation: in 0.2s ease-out;
 }
+
 @keyframes in {
   from {
     transform: translateY(8px);
@@ -51,5 +186,16 @@ select:focus {
   to {
     transform: none;
     opacity: 1;
+  }
+}
+
+@media (max-width: 640px) {
+  nav {
+    gap: 1rem !important;
+    overflow-x: auto;
+  }
+
+  nav .tab {
+    flex: 0 0 auto;
   }
 }
