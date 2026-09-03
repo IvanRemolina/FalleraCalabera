@@ -24,11 +24,11 @@
       "id": "09ca176c-5b7a-4ed0-aac7-719d72831700",
       "name": "Iván",
       "initialElo": 116,
-      "elo": 116,
-      "wins": 0,
+      "elo": 135,
+      "wins": 1,
       "losses": 0,
-      "games": 0,
-      "lastGame": "2026-09-03T15:48:04.877Z"
+      "games": 1,
+      "lastGame": "2026-09-03T20:57:59.493Z"
     },
     {
       "id": "ab787fe0-fd2f-474e-8058-250cccc93859",
@@ -44,10 +44,11 @@
       "id": "2c9b3299-62b1-40f5-ade9-6c864c6ba907",
       "name": "Lucía",
       "initialElo": 133,
-      "elo": 133,
+      "elo": 126,
       "wins": 0,
-      "losses": 0,
-      "games": 0
+      "losses": 1,
+      "games": 1,
+      "lastGame": "2026-09-03T20:57:59.493Z"
     },
     {
       "id": "8b69ea21-161b-4151-800d-0472c0041924",
@@ -63,10 +64,11 @@
       "id": "85c305b8-7871-4356-8b09-fae682145b5e",
       "name": "Marc",
       "initialElo": 100,
-      "elo": 100,
+      "elo": 94,
       "wins": 0,
-      "losses": 0,
-      "games": 0
+      "losses": 1,
+      "games": 1,
+      "lastGame": "2026-09-03T20:57:59.493Z"
     },
     {
       "id": "5d27a5a6-917a-4241-9ef9-104c5324dc15",
@@ -82,11 +84,11 @@
       "id": "599cd206-6510-438a-8fc1-b7b3c2181add",
       "name": "Cristian",
       "initialElo": 77,
-      "elo": 90,
+      "elo": 84,
       "wins": 1,
-      "losses": 0,
-      "games": 1,
-      "lastGame": "2026-09-03T20:57:20.913Z"
+      "losses": 1,
+      "games": 2,
+      "lastGame": "2026-09-03T20:57:59.493Z"
     },
     {
       "id": "b050d3d8-995e-4c37-a3d2-26fb2351cb3d",
@@ -105,6 +107,20 @@
       "players": [
         "599cd206-6510-438a-8fc1-b7b3c2181add",
         "5d27a5a6-917a-4241-9ef9-104c5324dc15"
+      ],
+      "deckId": "f499035f-48a7-44b5-a851-6207604ff52f",
+      "editions": [
+        1
+      ]
+    },
+    {
+      "id": "8c32fc13-b17f-4f4d-a518-f776aa77768d",
+      "date": "2026-09-03T20:57:59.493Z",
+      "players": [
+        "09ca176c-5b7a-4ed0-aac7-719d72831700",
+        "599cd206-6510-438a-8fc1-b7b3c2181add",
+        "85c305b8-7871-4356-8b09-fae682145b5e",
+        "2c9b3299-62b1-40f5-ade9-6c864c6ba907"
       ],
       "deckId": "f499035f-48a7-44b5-a851-6207604ff52f",
       "editions": [
