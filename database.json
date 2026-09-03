@@ -24,10 +24,10 @@
       "id": "09ca176c-5b7a-4ed0-aac7-719d72831700",
       "name": "Iván",
       "initialElo": 116,
-      "elo": 148,
-      "wins": 2,
+      "elo": 135,
+      "wins": 1,
       "losses": 0,
-      "games": 2,
+      "games": 1,
       "lastGame": "2026-09-03T20:59:58.782Z"
     },
     {
@@ -54,10 +54,10 @@
       "id": "8b69ea21-161b-4151-800d-0472c0041924",
       "name": "Uriel",
       "initialElo": 135,
-      "elo": 123,
+      "elo": 135,
       "wins": 0,
-      "losses": 1,
-      "games": 1,
+      "losses": 0,
+      "games": 0,
       "lastGame": "2026-09-03T20:59:58.782Z"
     },
     {
@@ -122,18 +122,6 @@
         "599cd206-6510-438a-8fc1-b7b3c2181add",
         "85c305b8-7871-4356-8b09-fae682145b5e",
         "2c9b3299-62b1-40f5-ade9-6c864c6ba907"
-      ],
-      "deckId": "f499035f-48a7-44b5-a851-6207604ff52f",
-      "editions": [
-        1
-      ]
-    },
-    {
-      "id": "1afec780-9c7b-427e-aca0-2cca842093bd",
-      "date": "2026-09-03T20:59:25.397Z",
-      "players": [
-        "09ca176c-5b7a-4ed0-aac7-719d72831700",
-        "8b69ea21-161b-4151-800d-0472c0041924"
       ],
       "deckId": "f499035f-48a7-44b5-a851-6207604ff52f",
       "editions": [
