@@ -28,9 +28,7 @@
   </head>
   <body class="min-h-screen font-sans">
     <header class="border-b border-[#ddcdb8] bg-[#fff8ed]/90 backdrop-blur">
-      <div
-        class="mx-auto flex max-w-6xl items-center justify-between px-5 py-5"
-      >
+      <div class="mx-auto flex max-w-6xl items-center justify-between px-5 py-5">
         <div>
           <p class="text-xs font-bold uppercase tracking-[.25em] text-coral">
             La Fallera Calavera
@@ -214,13 +212,16 @@
             ></select
           ></label>
         </div>
-          <div id="winnerFields" class="mt-5 space-y-3"></div>
-        <div id="editionChecks" class="mb-5 space-y-2"></div>
-            Selecciona el ganador de cada partida. Los demás participantes serán
-            los perdedores automáticamente.
-            ＋ Nueva baraja
-          </button>
-        </div>
+          <div id="editionChecks" class="mb-5 space-y-2"></div>
+          <div class="mb-5 flex justify-end">
+            <button
+              id="addDeckBtn"
+              class="rounded-lg border border-coral px-3 py-2 text-sm font-bold text-coral"
+              title="Añadir una baraja"
+            >
+              ＋ Nueva baraja
+            </button>
+          </div>
         <label class="mb-5 block text-sm font-bold"
           >Número de partidas<select
             id="gameCountInput"
@@ -250,9 +251,10 @@
           </select></label
         >
         <div id="participantFields" class="space-y-3"></div>
-        <p class="mt-4 text-xs text-[#766b5f]">
-          El ganador va primero y el resto son perdedores. El Elo se recalcula
-          desde todo el historial.
+        <div id="winnerFields" class="mt-5 space-y-3"></div>
+          <p class="mt-4 text-xs text-[#766b5f]">
+            Selecciona el ganador de cada partida. Los demás participantes serán
+            los perdedores automáticamente.
         </p>
         <button
           id="saveGameBtn"
