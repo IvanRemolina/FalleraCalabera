@@ -263,6 +263,39 @@ select:focus {
   outline-offset: 2px;
 }
 
+.edition-required {
+  cursor: not-allowed;
+}
+
+.edition-required span {
+  position: relative;
+  opacity: 0.9;
+}
+
+.edition-required span::after {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  display: grid;
+  width: 16px;
+  height: 16px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--surface-raised);
+  content: "🔒";
+  font-size: 10px;
+}
+
+.edition-shake span {
+  animation: edition-shake 280ms ease-in-out;
+}
+
+@keyframes edition-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
 /* Entrada breve del aviso emergente. */
 .toast {
   animation: in 0.2s ease-out;

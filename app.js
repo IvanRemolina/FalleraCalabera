@@ -347,7 +347,7 @@ function editionInputs() {
   const deck = db.decks.find((item) => item.id === $("#deckSelect").value);
   const maxEdition = deck?.maxEdition || 0;
   $("#editionChecks").innerHTML = maxEdition
-    ? `<p class="mb-2 text-sm font-bold">Ediciones incluidas</p><div class="edition-options">${Array.from({ length: maxEdition }, (_, index) => `<label class="edition-option"><input class="edition-check" type="checkbox" value="${index + 1}" ${index === 0 ? "checked disabled" : ""}/><span>${index + 1}</span></label>`).join("")}</div>`
+    ? `<p class="mb-2 text-sm font-bold">Ediciones incluidas</p><div class="edition-options">${Array.from({ length: maxEdition }, (_, index) => `<label class="edition-option${index === 0 ? " edition-required" : ""}" title="${index === 0 ? "La edición 1 siempre está incluida" : `Seleccionar edición ${index + 1}`}" aria-label="${index === 0 ? "Edición 1, siempre incluida" : `Seleccionar edición ${index + 1}`}" ><input class="edition-check" type="checkbox" value="${index + 1}" ${index === 0 ? "checked disabled" : ""}/><span>${index + 1}</span></label>`).join("")}</div>`
     : '<p class="text-sm text-[#766b5f]">Selecciona una baraja</p>';
 }
 
@@ -611,6 +611,14 @@ $("#savePlayerBtn").onclick = async () => {
 
 // Un único listener gestiona los botones que se crean dinámicamente al renderizar.
 document.addEventListener("click", async (e) => {
+  const requiredEdition = e.target.closest(".edition-required");
+  if (requiredEdition) {
+    requiredEdition.classList.remove("edition-shake");
+    void requiredEdition.offsetWidth;
+    requiredEdition.classList.add("edition-shake");
+    toast("La edición 1 siempre está incluida");
+    return;
+  }
   const close = e.target.closest("[data-close]");
   if (close) show("#" + close.dataset.close, false);
   const tab = e.target.closest(".tab");
