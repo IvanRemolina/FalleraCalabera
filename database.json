@@ -39,6 +39,15 @@
       "losses": 0,
       "games": 0,
       "lastGame": "2026-09-03T13:20:12.822Z"
+    },
+    {
+      "id": "2c9b3299-62b1-40f5-ade9-6c864c6ba907",
+      "name": "Lucía",
+      "initialElo": 133,
+      "elo": 133,
+      "wins": 0,
+      "losses": 0,
+      "games": 0
     }
   ],
   "games": [],
