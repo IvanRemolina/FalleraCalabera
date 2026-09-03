@@ -24,11 +24,11 @@
       "id": "09ca176c-5b7a-4ed0-aac7-719d72831700",
       "name": "Iván",
       "initialElo": 116,
-      "elo": 135,
+      "elo": 126,
       "wins": 1,
-      "losses": 0,
-      "games": 1,
-      "lastGame": "2026-09-03T20:57:59.493Z"
+      "losses": 1,
+      "games": 2,
+      "lastGame": "2026-09-03T20:59:08.856Z"
     },
     {
       "id": "ab787fe0-fd2f-474e-8058-250cccc93859",
@@ -44,11 +44,11 @@
       "id": "2c9b3299-62b1-40f5-ade9-6c864c6ba907",
       "name": "Lucía",
       "initialElo": 133,
-      "elo": 126,
-      "wins": 0,
+      "elo": 142,
+      "wins": 1,
       "losses": 1,
-      "games": 1,
-      "lastGame": "2026-09-03T20:57:59.493Z"
+      "games": 2,
+      "lastGame": "2026-09-03T20:59:08.856Z"
     },
     {
       "id": "8b69ea21-161b-4151-800d-0472c0041924",
@@ -74,11 +74,11 @@
       "id": "5d27a5a6-917a-4241-9ef9-104c5324dc15",
       "name": "Ezequiel",
       "initialElo": 100,
-      "elo": 87,
+      "elo": 80,
       "wins": 0,
-      "losses": 1,
-      "games": 1,
-      "lastGame": "2026-09-03T20:57:20.913Z"
+      "losses": 2,
+      "games": 2,
+      "lastGame": "2026-09-03T20:59:08.856Z"
     },
     {
       "id": "599cd206-6510-438a-8fc1-b7b3c2181add",
@@ -121,6 +121,19 @@
         "599cd206-6510-438a-8fc1-b7b3c2181add",
         "85c305b8-7871-4356-8b09-fae682145b5e",
         "2c9b3299-62b1-40f5-ade9-6c864c6ba907"
+      ],
+      "deckId": "f499035f-48a7-44b5-a851-6207604ff52f",
+      "editions": [
+        1
+      ]
+    },
+    {
+      "id": "78f8aa97-32b9-42eb-8790-52c4dc897e41",
+      "date": "2026-09-03T20:59:08.856Z",
+      "players": [
+        "2c9b3299-62b1-40f5-ade9-6c864c6ba907",
+        "5d27a5a6-917a-4241-9ef9-104c5324dc15",
+        "09ca176c-5b7a-4ed0-aac7-719d72831700"
       ],
       "deckId": "f499035f-48a7-44b5-a851-6207604ff52f",
       "editions": [
