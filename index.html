@@ -205,12 +205,22 @@
           <button class="close text-2xl" data-close="gameModal">×</button>
         </div>
         <div class="mb-5">
-          <label class="block text-sm font-bold"
-            >Baraja<select
-              id="deckSelect"
-              class="mt-2 w-full rounded-lg border border-[#cbb99f] bg-white p-3"
-            ></select
-          ></label>
+          <div class="flex items-end gap-3">
+            <label class="block flex-1 text-sm font-bold"
+              >Baraja<select
+                id="deckSelect"
+                class="mt-2 w-full rounded-lg border border-[#cbb99f] bg-white p-3"
+              ></select
+            ></label>
+            <button
+              id="addDeckBtn"
+              class="shrink-0 rounded-lg border border-coral px-3 py-2 text-sm font-bold text-coral"
+              title="Añadir una baraja"
+              type="button"
+            >
+              ＋ Nueva baraja
+            </button>
+          </div>
         </div>
         <label class="mb-5 block text-sm font-bold"
           >Fecha de la partida<input
@@ -219,15 +229,6 @@
             class="mt-2 w-full rounded-lg border border-[#cbb99f] bg-white p-3"
           /></label>
         <div id="editionChecks" class="mb-5 space-y-2"></div>
-        <div class="mb-5 flex justify-end">
-            <button
-              id="addDeckBtn"
-              class="rounded-lg border border-coral px-3 py-2 text-sm font-bold text-coral"
-              title="Añadir una baraja"
-            >
-              ＋ Nueva baraja
-            </button>
-          </div>
         <label class="mb-5 block text-sm font-bold"
           >Número de partidas<select
             id="gameCountInput"
