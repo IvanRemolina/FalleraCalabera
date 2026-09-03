@@ -66,6 +66,15 @@
       "wins": 0,
       "losses": 0,
       "games": 0
+    },
+    {
+      "id": "5d27a5a6-917a-4241-9ef9-104c5324dc15",
+      "name": "Ezequiel",
+      "initialElo": 100,
+      "elo": 100,
+      "wins": 0,
+      "losses": 0,
+      "games": 0
     }
   ],
   "games": [],
