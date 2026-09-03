@@ -10,7 +10,7 @@ Clasificación Elo para partidas de **La Fallera Calavera**. La aplicación perm
 - Alta, edición y eliminación de jugadores.
 - Recalculado cronológico de la puntuación Elo usando una amplitud de 400 y `K = 25`.
 - Modo local mediante `localStorage`.
-- Sincronización opcional con `database.json` en GitHub y actualización automática cada 15 segundos.
+- Sincronización opcional con `database.json` en GitHub y actualización automática cada 5 segundos.
 
 ## Uso local
 
