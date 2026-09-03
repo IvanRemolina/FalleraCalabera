@@ -97,5 +97,26 @@
     }
   ],
   "games": [],
-  "decks": []
+  "decks": [
+    {
+      "id": "94e69f67-e02a-4bba-a425-3842be4f8397",
+      "name": "Fallera",
+      "version": "Normal",
+      "units": [
+        {
+          "id": "feb9771d-900c-4033-998b-06670542d7ba",
+          "name": "Normal"
+        }
+      ],
+      "combinations": [
+        {
+          "id": "feaf6245-4d63-4958-97bf-eb85e7825cb2",
+          "name": "Normal",
+          "units": [
+            "feb9771d-900c-4033-998b-06670542d7ba"
+          ]
+        }
+      ]
+    }
+  ]
 }
