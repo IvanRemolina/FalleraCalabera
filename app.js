@@ -103,21 +103,18 @@ function dateText(iso) {
 
 function deckLabel(deck) {
   if (!deck) return "Baraja no especificada";
-  return deck.version ? `${deck.name} · ${deck.version}` : deck.name;
+  return deck.name;
 }
 
 function combinationLabel(deck, combinationId) {
-  const combination = deck?.combinations?.find((item) => item.id === combinationId);
-  return combination ? `${deckLabel(deck)} · ${combination.name}` : deckLabel(deck);
+  const editions = Array.isArray(combinationId) ? combinationId.join(", ") : combinationId;
+  return editions ? `${deckLabel(deck)} · Ediciones ${editions}` : deckLabel(deck);
 }
 
 function normalizeDeck(deck) {
-  if (deck.units?.length && deck.combinations?.length) return deck;
-  const unit = { id: crypto.randomUUID(), name: deck.version || "Única" };
   return {
     ...deck,
-    units: [unit],
-    combinations: [{ id: crypto.randomUUID(), name: unit.name, units: [unit.id] }],
+    maxEdition: Math.max(1, Number(deck.maxEdition) || deck.units?.length || 1),
   };
 }
 
@@ -322,7 +319,7 @@ function render() {
     .sort((a, b) => new Date(b.date) - new Date(a.date))
     .map(
       (g) =>
-        `<article class="panel flex items-center justify-between gap-4 rounded-xl p-4"><div><p class="text-xs font-bold uppercase tracking-wider text-[#766b5f]">${dateText(g.date)} · ${combinationLabel(db.decks.find((deck) => deck.id === g.deckId), g.combinationId)}</p><p class="mt-1 font-bold">${g.players
+        `<article class="panel flex items-center justify-between gap-4 rounded-xl p-4"><div><p class="text-xs font-bold uppercase tracking-wider text-[#766b5f]">${dateText(g.date)} · ${combinationLabel(db.decks.find((deck) => deck.id === g.deckId), g.editions || g.combinationId)}</p><p class="mt-1 font-bold">${g.players
           .map((id, i) => {
             const p = db.players.find((x) => x.id === id);
             return `<span class="text-coral">${i + 1}.</span> ${esc(p?.name || "Jugador eliminado")}`;
@@ -343,7 +340,7 @@ function render() {
   $("#decksBody").innerHTML = db.decks
     .map(
       (deck) =>
-        `<article class="panel flex items-center justify-between rounded-xl p-4"><div><b>${esc(deckLabel(deck))}</b><p class="text-sm text-[#766b5f]">${deck.units?.length || 1} barajas · ${deck.combinations?.length || 1} combinaciones · ${db.games.filter((game) => game.deckId === deck.id).length} partidas</p></div><div class="flex gap-3"><button class="editDeck text-sm font-bold text-coral" data-id="${deck.id}">Editar</button><button class="deleteDeck text-sm font-bold text-[#b84339]" data-id="${deck.id}">Eliminar</button></div></article>`,
+        `<article class="panel flex items-center justify-between rounded-xl p-4"><div><b>${esc(deckLabel(deck))}</b><p class="text-sm text-[#766b5f]">Hasta edición ${deck.maxEdition || 1} · ${db.games.filter((game) => game.deckId === deck.id).length} partidas</p></div><div class="flex gap-3"><button class="editDeck text-sm font-bold text-coral" data-id="${deck.id}">Editar</button><button class="deleteDeck text-sm font-bold text-[#b84339]" data-id="${deck.id}">Eliminar</button></div></article>`,
     )
     .join("");
   renderEvolution();
@@ -356,19 +353,15 @@ function deckInputs() {
         .join("")}`
     : '<option value="">Sin barajas: añade una primero</option>';
   $("#deckSelect").disabled = !db.decks.length;
-  $("#combinationSelect").innerHTML = '<option value="">Selecciona primero una baraja</option>';
-  $("#combinationSelect").disabled = true;
+  editionInputs();
 }
 
-function combinationInputs() {
+function editionInputs() {
   const deck = db.decks.find((item) => item.id === $("#deckSelect").value);
-  const combinations = deck?.combinations || [];
-  $("#combinationSelect").innerHTML = combinations.length
-    ? `<option value="">Selecciona combinación</option>${combinations
-        .map((combination) => `<option value="${combination.id}">${esc(combination.name)}</option>`)
-        .join("")}`
-    : '<option value="">Esta baraja no tiene combinaciones</option>';
-  $("#combinationSelect").disabled = !combinations.length;
+  const maxEdition = deck?.maxEdition || 0;
+  $("#editionChecks").innerHTML = maxEdition
+    ? `<p class="text-sm font-bold">Ediciones incluidas</p><div class="flex flex-wrap gap-4">${Array.from({ length: maxEdition }, (_, index) => `<label class="flex items-center gap-2 text-sm"><input class="edition-check h-4 w-4" type="checkbox" value="${index + 1}" ${index === 0 ? "checked" : ""}/>Edición ${index + 1}</label>`).join("")}</div>`
+    : '<p class="text-sm text-[#766b5f]">Selecciona una baraja</p>';
 }
 
 function participantInputs() {
@@ -563,15 +556,15 @@ $("#saveGameBtn").onclick = async () => {
   if (new Set(ids).size !== ids.length)
     return toast("No repitas jugadores", true);
   const deckId = $("#deckSelect").value;
-  const combinationId = $("#combinationSelect").value;
-  if (!deckId || !combinationId)
-    return toast("Selecciona una baraja y una combinación", true);
+  const editions = [...document.querySelectorAll(".edition-check:checked")].map((input) => Number(input.value));
+  if (!deckId || !editions.length)
+    return toast("Selecciona una baraja y al menos una edición", true);
   db.games.push({
     id: crypto.randomUUID(),
     date: new Date().toISOString(),
     players: ids,
     deckId,
-    combinationId,
+    editions,
   });
   // Solo los participantes deben mostrar esta partida como la última jugada.
   ids.forEach((id) => {
@@ -588,39 +581,20 @@ function openDeckModal() {
   editingDeckId = null;
   $("#deckModalTitle").textContent = "Nueva baraja";
   $("#deckName").value = "";
-  $("#deckVersion").value = "";
-  $("#deckUnits").value = "";
-  $("#deckCombinations").value = "";
+  $("#deckMaxEdition").value = 1;
   show("#deckModal");
 }
 $("#addDeckBtn").onclick = openDeckModal;
 $("#manageDeckBtn").onclick = openDeckModal;
-$("#deckSelect").onchange = combinationInputs;
+$("#deckSelect").onchange = editionInputs;
 $("#saveDeckBtn").onclick = async () => {
   if (!ensureCanEdit()) return;
   const name = $("#deckName").value.trim();
-  const version = $("#deckVersion").value.trim();
-  const unitNames = $("#deckUnits").value.split("\n").map((unit) => unit.trim()).filter(Boolean);
-  const combinationLines = $("#deckCombinations").value.split("\n").map((line) => line.trim()).filter(Boolean);
-  if (!name || !unitNames.length)
-    return toast("Escribe un nombre y al menos una baraja", true);
+  const maxEdition = Number($("#deckMaxEdition").value);
+  if (!name || !Number.isInteger(maxEdition) || maxEdition < 1 || maxEdition > 20)
+    return toast("Escribe un nombre y un número de edición válido", true);
   const existing = db.decks.find((deck) => deck.id === editingDeckId);
-  const units = unitNames.map((unitName, index) => ({
-    id: existing?.units?.[index]?.id || crypto.randomUUID(),
-    name: unitName,
-  }));
-  const combinations = combinationLines.length
-    ? combinationLines.map((line) => {
-        const [combinationName, indexes] = line.split(":");
-        const selectedUnits = (indexes || "").split(",").map((value) => Number(value.trim()) - 1);
-        if (!combinationName?.trim() || selectedUnits.some((index) => !units[index])) return null;
-        const previous = existing?.combinations?.find((item) => item.name === combinationName.trim());
-        return { id: previous?.id || crypto.randomUUID(), name: combinationName.trim(), units: selectedUnits.map((index) => units[index].id) };
-      }).filter(Boolean)
-    : units.map((unit, index) => ({ id: crypto.randomUUID(), name: unit.name, units: units.slice(0, index + 1).map((item) => item.id) }));
-  if (!combinations.length)
-    return toast("Añade al menos una combinación válida", true);
-  const deck = { id: editingDeckId || crypto.randomUUID(), name, version, units, combinations };
+  const deck = { id: editingDeckId || crypto.randomUUID(), name, maxEdition };
   if (existing) db.decks[db.decks.indexOf(existing)] = deck;
   else db.decks.push(deck);
   localStorage.setItem("fallera-local", JSON.stringify(db));
@@ -719,11 +693,7 @@ document.addEventListener("click", async (e) => {
       editingDeckId = deck.id;
       $("#deckModalTitle").textContent = "Editar baraja";
       $("#deckName").value = deck.name;
-      $("#deckVersion").value = deck.version || "";
-      $("#deckUnits").value = (deck.units || []).map((unit) => unit.name).join("\n");
-      $("#deckCombinations").value = (deck.combinations || [])
-        .map((combination) => `${combination.name}: ${combination.units.map((unitId) => (deck.units || []).findIndex((unit) => unit.id === unitId) + 1).join(",")}`)
-        .join("\n");
+      $("#deckMaxEdition").value = deck.maxEdition || deck.units?.length || 1;
       show("#deckModal");
     }
   }

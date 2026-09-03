@@ -7,7 +7,7 @@ Clasificación Elo para partidas de **La Fallera Calavera**. La aplicación perm
 - Tabla de clasificación con Elo, victorias, derrotas, porcentaje de victorias y partidas jugadas.
 - Gráfico de evolución del Elo por jugador, con puntos interactivos y filtro por fechas.
 - Registro de partidas de 2 a 6 jugadores, ordenadas por puesto.
-- Catálogo de modos de juego con varias barajas y combinaciones configurables.
+- Catálogo de barajas con un número de edición ampliable y selección por casillas.
 - Historial de partidas con opción de eliminar resultados.
 - Alta, edición y eliminación de jugadores.
 - Recalculado cronológico de la puntuación Elo usando una amplitud de 400 y `K = 25`.
@@ -88,7 +88,7 @@ Pulsa **Modo local** en la configuración para trabajar sin GitHub. Los cambios 
 }
 ```
 
-Además, las partidas nuevas guardan el identificador de la baraja y de la combinación utilizada. Cada modo puede tener varias barajas y combinaciones configurables:
+Además, las partidas nuevas guardan el identificador de la baraja y las ediciones seleccionadas:
 
 ```json
 {
@@ -99,24 +99,18 @@ Además, las partidas nuevas guardan el identificador de la baraja y de la combi
       "date": "...",
       "players": ["..."],
       "deckId": "...",
-      "combinationId": "..."
+      "editions": [1, 2, 3]
     }
   ],
   "decks": [{
     "id": "...",
     "name": "Fallera Calavera",
-    "version": "Deluxe",
-    "units": [{ "id": "...", "name": "Baraja 1" }],
-    "combinations": [{
-      "id": "...",
-      "name": "Barajas 1 + 2",
-      "units": ["..."]
-    }]
+    "maxEdition": 3
   }]
 }
 ```
 
-Las partidas antiguas sin `deckId` siguen siendo válidas y se muestran como “Baraja no especificada”. Las barajas antiguas que solo tenían nombre y versión se adaptan automáticamente a una unidad y una combinación única. Eliminar una baraja ya utilizada está bloqueado para no perder la referencia histórica.
+Las partidas antiguas sin `deckId` siguen siendo válidas y se muestran como “Baraja no especificada”. Las barajas antiguas que solo tenían nombre y versión se adaptan automáticamente a una edición. Eliminar una baraja ya utilizada está bloqueado para no perder la referencia histórica.
 
 Cada jugador conserva su identificador, nombre y Elo inicial. Cada partida conserva la fecha y los identificadores de los jugadores en orden de clasificación, del primer puesto al último. El Elo actual y las estadísticas se reconstruyen al cargar los datos, por lo que el historial es la fuente de verdad.
 

@@ -206,20 +206,15 @@
           </div>
           <button class="close text-2xl" data-close="gameModal">×</button>
         </div>
-        <div class="mb-5 grid gap-3 sm:grid-cols-2">
+        <div class="mb-5">
           <label class="block text-sm font-bold"
             >Baraja<select
               id="deckSelect"
               class="mt-2 w-full rounded-lg border border-[#cbb99f] bg-white p-3"
             ></select
           ></label>
-          <label class="block text-sm font-bold"
-            >Combinación<select
-              id="combinationSelect"
-              class="mt-2 w-full rounded-lg border border-[#cbb99f] bg-white p-3"
-            ></select
-          ></label>
         </div>
+        <div id="editionChecks" class="mb-5 space-y-2"></div>
         <div class="mb-5 flex justify-end">
           <button id="addDeckBtn" class="rounded-lg border border-coral px-3 py-2 text-sm font-bold text-coral" title="Añadir una baraja">
             ＋ Nueva baraja
@@ -272,32 +267,15 @@
             maxlength="60"
             placeholder="Fallera Calavera"
         /></label>
-        <label class="mb-4 block text-sm font-bold"
-          >Edición o modo
-          <input
-            id="deckVersion"
-            class="mt-2 w-full rounded-lg border border-[#cbb99f] bg-white p-3"
-            maxlength="40"
-            placeholder="Deluxe, clásico..."
-        /></label>
-        <label class="mb-4 block text-sm font-bold"
-          >Barajas incluidas
-          <textarea
-            id="deckUnits"
-            class="mt-2 min-h-24 w-full rounded-lg border border-[#cbb99f] bg-white p-3"
-            placeholder="Baraja 1&#10;Baraja 2&#10;Baraja 3"
-          ></textarea>
-          <span class="mt-1 block text-xs font-normal text-[#766b5f]">Una por línea. Puedes añadir más en el futuro.</span>
-        </label>
         <label class="block text-sm font-bold"
-          >Combinaciones disponibles
-          <textarea
-            id="deckCombinations"
-            class="mt-2 min-h-28 w-full rounded-lg border border-[#cbb99f] bg-white p-3"
-            placeholder="Solo baraja 1: 1&#10;Barajas 1 + 2: 1,2&#10;Barajas 1 + 2 + 3: 1,2,3"
-          ></textarea>
-          <span class="mt-1 block text-xs font-normal text-[#766b5f]">Una por línea con el formato: nombre: números de baraja.</span>
-        </label>
+          >Número máximo de edición<input
+            id="deckMaxEdition"
+            type="number"
+            min="1"
+            max="20"
+            value="1"
+            class="mt-2 w-full rounded-lg border border-[#cbb99f] bg-white p-3"
+          /><span class="mt-1 block text-xs font-normal text-[#766b5f]">Por ejemplo, 4 mostrará las ediciones 1, 2, 3 y 4.</span></label>
         <button
           id="saveDeckBtn"
           class="mt-6 w-full rounded-lg bg-coral px-4 py-3 font-bold text-white"
@@ -377,14 +355,6 @@
             readonly
             value="main"
             class="mt-2 w-full rounded-lg border border-[#cbb99f] bg-[#f4eadb] p-3" /></label
-        ><label class="mt-3 block text-sm font-bold"
-          >Token del propietario<input
-            id="ghToken"
-            type="password"
-            class="mt-2 w-full rounded-lg border border-[#cbb99f] bg-white p-3"
-            placeholder="Solo para configurar este navegador"
-        /></label>
-        <p class="mt-2 text-xs text-[#766b5f]">
           Para compartir sin GitHub, configura un token nuevo en
           <code>BUILT_IN_TOKEN</code> dentro de <code>app.js</code> antes de
           publicar.
