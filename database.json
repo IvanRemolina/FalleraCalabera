@@ -72,19 +72,21 @@
       "id": "5d27a5a6-917a-4241-9ef9-104c5324dc15",
       "name": "Ezequiel",
       "initialElo": 100,
-      "elo": 100,
+      "elo": 87,
       "wins": 0,
-      "losses": 0,
-      "games": 0
+      "losses": 1,
+      "games": 1,
+      "lastGame": "2026-09-03T20:57:20.913Z"
     },
     {
       "id": "599cd206-6510-438a-8fc1-b7b3c2181add",
       "name": "Cristian",
       "initialElo": 77,
-      "elo": 77,
-      "wins": 0,
+      "elo": 90,
+      "wins": 1,
       "losses": 0,
-      "games": 0
+      "games": 1,
+      "lastGame": "2026-09-03T20:57:20.913Z"
     },
     {
       "id": "b050d3d8-995e-4c37-a3d2-26fb2351cb3d",
@@ -96,7 +98,20 @@
       "games": 0
     }
   ],
-  "games": [],
+  "games": [
+    {
+      "id": "4a9b6648-b7cb-41c9-9b75-78d5ef16ac3e",
+      "date": "2026-09-03T20:57:20.913Z",
+      "players": [
+        "599cd206-6510-438a-8fc1-b7b3c2181add",
+        "5d27a5a6-917a-4241-9ef9-104c5324dc15"
+      ],
+      "deckId": "f499035f-48a7-44b5-a851-6207604ff52f",
+      "editions": [
+        1
+      ]
+    }
+  ],
   "decks": [
     {
       "id": "f499035f-48a7-44b5-a851-6207604ff52f",
