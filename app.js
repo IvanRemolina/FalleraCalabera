@@ -301,6 +301,111 @@ function renderEvolution() {
   $("#evolutionLegend").innerHTML = players.map((player, index) => `<span><i class="legend-dot" style="background:${colors[index % colors.length]}"></i>${esc(player.name)}</span>`).join("");
 }
 
+function expectedOutcome(elo, participantElos) {
+  const weights = participantElos.map((rating) => 10 ** (rating / 400));
+  return 10 ** (elo / 400) / weights.reduce((sum, weight) => sum + weight, 0);
+}
+
+function simulateMatchElo(participants) {
+  const total = participants.reduce((sum, player) => sum + 10 ** (player.elo / 400), 0);
+  const baseDelta = 25;
+
+  return participants.map((player, index) => {
+    const rivals = participants.filter((_, rivalIndex) => rivalIndex !== index).map((rival) => rival.elo);
+    const expected = expectedOutcome(player.elo, rivals.length ? rivals : [player.elo]);
+    const actual = index === 0 ? 1 : 0;
+    const rawDelta = baseDelta * (actual - expected);
+    const roundedDelta = Math.round(rawDelta);
+    const finalDelta = Math.abs(roundedDelta) < 1 ? (actual ? 1 : -1) : roundedDelta;
+    return {
+      ...player,
+      delta: finalDelta,
+      newElo: player.elo + finalDelta,
+      result: index === 0 ? "gana" : "pierde",
+    };
+  });
+}
+
+function renderSimulator() {
+  const count = Number($("#simulatorPlayerCount")?.value || 2);
+  const players = [...db.players]
+    .sort((a, b) => a.name.localeCompare(b.name, "es"))
+    .slice(0, count);
+
+  if (!players.length) {
+    $("#simulatorFields").innerHTML = '<p class="text-sm text-[#766b5f]">Necesitas jugadores para simular la partida.</p>';
+    $("#simulatorWinner").innerHTML = '<option value="">Sin jugadores</option>';
+    $("#simulatorSummary").innerHTML = "";
+    return;
+  }
+
+  $("#simulatorFields").innerHTML = players
+    .map(
+      (player, index) => `
+        <label class="block text-sm font-bold">
+          ${index === 0 ? "Ganador ficticio" : `Jugador ${index + 1}`}
+          <input
+            type="number"
+            class="simulator-player-elo mt-2 w-full rounded-lg border border-[#cbb99f] bg-white p-3"
+            data-index="${index}"
+            min="0"
+            max="4000"
+            value="${Math.round(player.elo || 100)}"
+          />
+        </label>
+      `,
+    )
+    .join("");
+
+  $("#simulatorWinner").innerHTML = players
+    .map(
+      (player) => `<option value="${player.id}">${esc(player.name)}</option>`,
+    )
+    .join("");
+
+  const updateSummary = () => {
+    const selectedValues = [...document.querySelectorAll(".simulator-player-elo")].map((input) => Number(input.value) || 100);
+    const entries = players.map((player, index) => ({
+      id: player.id,
+      name: player.name,
+      elo: selectedValues[index] ?? player.elo,
+    }));
+    const winnerId = $("#simulatorWinner").value || entries[0]?.id;
+    const winnerIndex = entries.findIndex((entry) => entry.id === winnerId);
+    const ordered = simulateMatchElo(
+      entries.map((entry, idx) => ({
+        ...entry,
+        elo: entry.elo,
+        actualWinner: idx === winnerIndex,
+      })),
+    );
+
+    $("#simulatorSummary").innerHTML = ordered
+      .map(
+        (entry) => `
+          <div class="flex items-center justify-between rounded-lg border border-[#ddcdb8] p-3">
+            <div>
+              <div class="font-bold">${esc(entry.name)}</div>
+              <div class="text-xs text-[#766b5f]">Elo actual: ${entry.elo - entry.delta} → ${entry.newElo}</div>
+            </div>
+            <div class="text-right">
+              <div class="font-bold ${entry.delta >= 0 ? "text-coral" : "text-[#766b5f]"}">${entry.delta >= 0 ? "+" : ""}${entry.delta}</div>
+              <div class="text-xs text-[#766b5f]">${entry.result === "gana" ? "Gana" : "Pierde"}</div>
+            </div>
+          </div>
+        `,
+      )
+      .join("");
+  };
+
+  $("#simulatorWinner").onchange = updateSummary;
+  document.querySelectorAll(".simulator-player-elo").forEach((input) => {
+    input.oninput = updateSummary;
+  });
+
+  updateSummary();
+}
+
 function render() {
   recalculate();
   const ranked = [...db.players].sort(
@@ -591,6 +696,7 @@ $("#newGameBtn").onclick = () => {
 $("#playerCount").onchange = participantInputs;
 $("#gameCountInput").onchange = winnerInputs;
 $("#participantFields").onchange = winnerInputs;
+$("#simulatorPlayerCount").onchange = renderSimulator;
 $("#playerSortSelect").onchange = render;
 $("#evolutionStart").onchange = renderEvolution;
 $("#evolutionEnd").onchange = renderEvolution;
@@ -737,9 +843,10 @@ document.addEventListener("click", async (e) => {
       .querySelectorAll(".tab")
       .forEach((x) => x.classList.remove("active"));
     tab.classList.add("active");
-    ["ranking", "history", "players", "decks", "evolution"].forEach((v) =>
+    ["ranking", "history", "players", "decks", "simulator", "evolution"].forEach((v) =>
       $("#" + v + "View").classList.toggle("hidden", v !== tab.dataset.view),
     );
+    if (tab.dataset.view === "simulator") renderSimulator();
   }
   const ep = e.target.closest(".editPlayer");
   if (ep && ensureCanEdit()) {
