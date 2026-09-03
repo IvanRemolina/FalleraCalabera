@@ -1,118 +1,137 @@
 # Fallera Elo
 
-Clasificación Elo para partidas de **La Fallera Calavera**. La aplicación permite registrar jugadores y resultados, recalcular la clasificación desde el historial y compartir los datos mediante GitHub.
+Clasificación Elo para partidas de **La Fallera Calavera**. La aplicación permite registrar jugadores, jugar partidas, simular resultados, comparar barajas y recalcular la clasificación desde el historial completo.
 
-## Funciones
+## Funciones actuales
 
-- Tabla de clasificación con Elo, victorias, derrotas, porcentaje de victorias y partidas jugadas.
-- Gráfico de evolución del Elo por jugador, con puntos interactivos y filtro por fechas.
-- Registro de partidas de 2 a 6 jugadores, ordenadas por puesto.
-- Catálogo de barajas con un número de edición ampliable y selección por casillas.
-- Historial de partidas con opción de eliminar resultados.
-- Alta, edición y eliminación de jugadores.
-- Recalculado cronológico de la puntuación Elo usando una amplitud de 400 y `K = 25`.
-- Sincronización opcional con `database.json` en GitHub y actualización automática cada 5 segundos.
+- Ranking principal con Elo, victorias, derrotas, porcentaje de victorias y partidas jugadas.
+- Gestión de jugadores: alta, edición y eliminación.
+- Gestión de barajas: creación, edición y bloqueo de eliminación si ya están en uso.
+- Registro de partidas con fecha, baraja, ediciones activas y participantes por orden de clasificación.
+- Validación de edición base: la edición 1 siempre queda incluida y bloqueada en la UI.
+- Historial de partidas con posibilidad de editar o eliminar resultados.
+- Simulador de partida para comprobar cuántos puntos subirías o bajarías en una partida ficticia.
+- Evolución del Elo con filtro por fechas y puntos por partida.
+- Sincronización opcional con GitHub mediante `database.json` y actualización automática.
+
+## Pestañas principales
+
+- Clasificación: resumen general del Elo actual.
+- Historial: listado cronológico de partidas jugadas.
+- Jugadores: gestión del listado de participantes.
+- Barajas: catálogo de mazos y edición máxima disponible.
+- Simular partida: cálculo instantáneo del cambio de Elo para todos los jugadores.
+- Evolución: gráfico de progresión del Elo por fechas.
 
 ## Uso local
 
-Después, abre <http://localhost:8000> en el navegador.
+1. Abre la carpeta del proyecto.
+2. Sirve los archivos localmente con un servidor estático.
+3. Entra en la ruta del navegador, por ejemplo: http://localhost:8000
 
-También puedes publicar directamente los archivos `index.html`, `styles.css` y `app.js` en un servicio de hosting estático.
+También puedes publicar directamente `index.html`, `styles.css` y `app.js` en un hosting estático.
 
-## Evolución del Elo
+## Simular partida
 
-En la pestaña **Evolución** se muestra una línea por jugador y un punto después de
-cada partida. Al pasar el cursor sobre un punto se muestra el nombre y el Elo de
-ese momento. Sin fechas seleccionadas se incluye todo el historial. El filtro de
-inicio incluye el día desde las `00:00` y el filtro de fin lo incluye hasta las
-`23:59:59.999`, por lo que se pueden consultar días completos.
+En la pestaña **Simular partida** puedes:
 
-## Configurar GitHub
+- elegir cuántos jugadores participan,
+- introducir el Elo inicial de cada uno,
+- seleccionar quién gana la simulación,
+- ver el cambio simultáneo de Elo para todos.
 
-La configuración predeterminada apunta a:
+La simulación usa la misma lógica del cálculo Elo de la aplicación, con un ajuste mínimo de 1 punto y sin escribir nada en la base de datos.
+
+## Configuración de GitHub
+
+La configuración por defecto apunta a:
 
 - Propietario: `IvanRemolina`
 - Repositorio: `FalleraCalabera`
 - Rama: `main`
 
-Para guardar los cambios en GitHub:
+Para guardar cambios en GitHub:
 
-1. Abre **Configuración** dentro de la aplicación.
-2. Introduce un token personal de GitHub con permiso para leer y modificar el contenido del repositorio.
-3. Guarda la configuración y carga los datos.
+1. Abre **Configuración**.
+2. Añade un token personal con permisos de lectura/escritura sobre el repositorio.
+3. Guarda la configuración.
 
-El token se guarda únicamente en el `localStorage` del navegador que lo configura. No lo compartas ni lo incluyas en el código publicado. Para una instalación compartida, `app.js` admite configurar `BUILT_IN_TOKEN`, pero hacerlo expone el token a cualquier persona que pueda descargar la aplicación.
+El token se guarda en `localStorage` del navegador. No lo compartas ni lo publiques en repositorios.
 
 ## Reglas del cálculo Elo
 
 - Cada jugador nuevo empieza con `100` puntos.
-- Para dos jugadores, la probabilidad esperada se calcula así:
+- La probabilidad esperada se calcula con la fórmula estándar de Elo:
 
   $$
-  P(X)=\frac{10^{X/400}}{10^{X/400}+10^{Y/400}}
+  P(X) = \frac{10^{X/400}}{\sum_{i=1}^{n} 10^{R_i/400}}
   $$
 
-- En una partida de varios jugadores se usa la misma fórmula multinomial, con todos los participantes en el denominador.
-- El ganador recibe `25 × (1 - probabilidad)` y cada perdedor recibe `25 × (0 - probabilidad)`.
-- El resultado se redondea a puntos enteros y cada cambio tiene un mínimo de 1 punto. Esta última regla puede provocar una pequeña desviación respecto a la suma inicial.
-- La desviación mostrada es la suma del Elo actual menos `100 × número de jugadores`. El porcentaje se calcula respecto a ese valor inicial.
+- El ganador recibe una variación basada en `25 × (1 - probabilidad)`.
+- Los demás reciben `25 × (0 - probabilidad)`.
+- Cada cambio se redondea a entero y, si el resultado es muy pequeño, se fuerza un mínimo de 1 punto.
+- El historial completo es la fuente de verdad, y el ranking se reconstruye al cargar los datos.
 
-El historial de partidas es la fuente de verdad. El Elo y las estadísticas se reconstruyen desde el principio cada vez que se cargan o modifican los datos.
+## Datos y estructura
+
+`database.json` contiene esta estructura base:
+
+```json
+{
+  "players": [],
+  "games": [],
+  "decks": []
+}
+```
+
+Cada partida guarda:
+
+```json
+{
+  "id": "...",
+  "date": "...",
+  "players": ["id-jugador-1", "id-jugador-2"],
+  "deckId": "...",
+  "editions": [1, 2, 3]
+}
+```
+
+Cada baraja guarda:
+
+```json
+{
+  "id": "...",
+  "name": "Fallera Calavera",
+  "maxEdition": 3
+}
+```
+
+Reglas importantes:
+
+- La edición 1 siempre queda incluida en cualquier partida de esa baraja.
+- Las partidas antiguas sin `deckId` siguen funcionando y se muestran como “Baraja no especificada”.
+- Si una baraja ya se está usando, no se puede eliminar para evitar romper la referencia histórica.
+- El nombre y el Elo inicial del jugador se conservan junto con el historial.
 
 ## Sincronización y despliegue
 
-- Leer el ranking es público y no necesita token.
-- Guardar jugadores o partidas usa la API de contenidos de GitHub con el token del propietario.
-- Cada escritura de `database.json` genera un commit técnico en GitHub. Eso es necesario para versionar el archivo, aunque no haya un commit manual ni una pipeline ejecutada por el usuario.
-- GitHub Pages usa [`.github/workflows/pages.yml`](.github/workflows/pages.yml). Ese workflow despliega los cambios de la aplicación, pero ignora los commits que solo modifican `database.json`.
-- Los navegadores consultan los datos cada 5 segundos. Es una actualización rápida, no tiempo real, y muchos dispositivos pueden alcanzar el límite de la API pública de GitHub.
-- Si dos personas guardan cambios al mismo tiempo, ambas pueden partir de una versión antigua del archivo y una escritura puede ser rechazada por conflicto. Para el uso casero previsto, conviene que solo una persona edite a la vez.
+- Leer datos es público y no necesita token.
+- Guardar jugadores, partidas y barajas usa la API de GitHub con el token del propietario.
+- Cada escritura genera un commit técnico de `database.json` en el repositorio.
+- El navegador consulta los datos cada 5 segundos y vuelve a renderizar la vista si hay cambios.
+- Si dos personas guardan a la vez, puede haber conflictos. Para uso doméstico o compartido controlado, conviene que solo una persona edite al mismo tiempo.
 
-El token permite escribir en el repositorio, por lo que nunca debe publicarse en `BUILT_IN_TOKEN` ni compartirse.
+## Estructura del proyecto
 
-## Datos
+| Archivo | Responsabilidad |
+| --- | --- |
+| `index.html` | Estructura de la interfaz, pestañas y modales |
+| `styles.css` | Tema visual, paneles, modales y estilo de ediciones |
+| `app.js` | Lógica principal, cálculo Elo, render y sincronización |
+| `database.json` | Datos persistentes de jugadores, partidas y barajas |
 
-`database.json` contiene tres colecciones:
+## Notas de mantenimiento
 
-```json
-{
-  "players": [],
-  "games": []
-}
-```
-
-Además, las partidas nuevas guardan el identificador de la baraja y las ediciones seleccionadas:
-
-```json
-{
-  "players": [],
-  "games": [
-    {
-      "id": "...",
-      "date": "...",
-      "players": ["..."],
-      "deckId": "...",
-      "editions": [1, 2, 3]
-    }
-  ],
-  "decks": [{
-    "id": "...",
-    "name": "Fallera Calavera",
-    "maxEdition": 3
-  }]
-}
-```
-
-Las partidas antiguas sin `deckId` siguen siendo válidas y se muestran como “Baraja no especificada”. Las barajas antiguas que solo tenían nombre y versión se adaptan automáticamente a una edición. Eliminar una baraja ya utilizada está bloqueado para no perder la referencia histórica.
-
-Cada jugador conserva su identificador, nombre, un Elo teórico inicial de `100` y un `startingElo` que representa el Elo actual importado cuando no existe el historial antiguo. Las partidas nuevas se calculan desde ese valor de partida. Cada partida conserva la fecha y los identificadores de los jugadores en orden de clasificación, del primer puesto al último. El Elo actual y las estadísticas de las partidas nuevas se reconstruyen al cargar los datos; la desviación siempre se compara con `100 × número de jugadores`.
-
-## Estructura
-
-| Archivo                       | Responsabilidad                                        |
-| ----------------------------- | ------------------------------------------------------ |
-| `index.html`                  | Estructura de la interfaz y modales                    |
-| `styles.css`                  | Fondo, paneles, estados y animaciones                  |
-| `app.js`                      | Interfaz, cálculo Elo, almacenamiento y API de GitHub  |
-| `database.json`               | Datos compartidos de jugadores, partidas y barajas     |
-| `.github/workflows/pages.yml` | Despliegue de Pages excepto para cambios solo de datos |
+- Si cambias la lógica del Elo, revisa también la pestaña de simulación para que ambos cálculos sigan coincidiendo.
+- Si cambias el modelo de barajas, asegúrate de mantener la compatibilidad con partidas antiguas.
+- La edición 1 está diseñada como base obligatoria, así que cualquier cambio visual o funcional debe respetar ese comportamiento.
