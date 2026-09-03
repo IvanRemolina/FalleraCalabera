@@ -128,7 +128,20 @@
         </p>
       </section>
       <section id="playersView" class="hidden">
-        <div class="mb-4 flex justify-end">
+        <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <label class="flex items-center gap-2 text-sm font-bold text-[#766b5f]"
+            >Ordenar
+            <select
+              id="playerSortSelect"
+              class="rounded-lg border border-[#cbb99f] bg-white p-2 text-sm"
+            >
+              <option value="alphabetic" selected>Alfabético</option>
+              <option value="elo">Elo</option>
+              <option value="games">Partidas jugadas</option>
+              <option value="wins">Victorias</option>
+              <option value="losses">Derrotas</option>
+            </select>
+          </label>
           <button
             id="addPlayerBtn"
             class="rounded-lg border border-coral px-4 py-2 text-sm font-bold text-coral hover:bg-[#fff8ed]"
@@ -202,8 +215,8 @@
         >
         <div id="participantFields" class="space-y-3"></div>
         <p class="mt-4 text-xs text-[#766b5f]">
-          Ordena del primer puesto al último. El Elo se recalcula desde todo el
-          historial.
+          El ganador va primero y el resto son perdedores. El Elo se recalcula
+          desde todo el historial.
         </p>
         <button
           id="saveGameBtn"

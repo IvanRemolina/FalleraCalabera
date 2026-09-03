@@ -150,9 +150,52 @@ function recalculate() {
   }
 }
 
+function buildRankLabels(players) {
+  const labels = Array(players.length).fill("");
+
+  for (let i = 0; i < players.length; i++) {
+    if (labels[i]) continue;
+
+    let last = i;
+    while (last + 1 < players.length && players[last + 1].elo === players[i].elo) {
+      last += 1;
+    }
+
+    const label =
+      i === last ? `${i + 1}` : `${i + 1}-${last + 1}`;
+
+    for (let j = i; j <= last; j += 1) {
+      labels[j] = label;
+    }
+  }
+
+  return labels;
+}
+
+function sortPlayers(players, mode = "alphabetic") {
+  const list = [...players];
+
+  switch (mode) {
+    case "elo":
+      return list.sort((a, b) => b.elo - a.elo || a.name.localeCompare(b.name));
+    case "games":
+      return list.sort((a, b) => b.games - a.games || b.elo - a.elo || a.name.localeCompare(b.name));
+    case "wins":
+      return list.sort((a, b) => b.wins - a.wins || b.elo - a.elo || a.name.localeCompare(b.name));
+    case "losses":
+      return list.sort((a, b) => b.losses - a.losses || b.elo - a.elo || a.name.localeCompare(b.name));
+    case "alphabetic":
+    default:
+      return list.sort((a, b) => a.name.localeCompare(b.name));
+  }
+}
+
 function render() {
   recalculate();
-  const ranked = [...db.players].sort((a, b) => b.elo - a.elo);
+  const ranked = [...db.players].sort(
+    (a, b) => b.elo - a.elo || a.name.localeCompare(b.name),
+  );
+  const rankLabels = buildRankLabels(ranked);
   const baselineElo = ranked.length * 100;
   const totalElo = ranked.reduce((sum, player) => sum + player.elo, 0);
   const deviation = totalElo - baselineElo;
@@ -165,7 +208,7 @@ function render() {
   $("#rankingBody").innerHTML = ranked
     .map(
       (p, i) =>
-        `<tr class="border-b border-[#eadfce] last:border-0"><td class="px-5 py-4"><span class="rank mr-2 text-xl font-bold text-coral">${i + 1}</span><b>${esc(p.name)}</b></td><td class="font-bold">${p.elo}</td><td>${p.wins}</td><td>${p.losses}</td><td>${p.games ? Math.round((p.wins / p.games) * 100) : 0}%</td><td>${p.games}</td><td>${p.lastGame ? dateText(p.lastGame) : "—"}</td></tr>`,
+        `<tr class="border-b border-[#eadfce] last:border-0"><td class="px-5 py-4"><span class="rank mr-2 text-xl font-bold text-coral">${rankLabels[i]}</span><b>${esc(p.name)}</b></td><td class="font-bold">${p.elo}</td><td>${p.wins}</td><td>${p.losses}</td><td>${p.games ? Math.round((p.wins / p.games) * 100) : 0}%</td><td>${p.games}</td><td>${p.lastGame ? dateText(p.lastGame) : "—"}</td></tr>`,
     )
     .join("");
   $("#gameCount").textContent = db.games.length ? `(${db.games.length})` : "";
@@ -184,7 +227,9 @@ function render() {
           )}</p></div><button class="deleteGame rounded-lg border border-[#ddcdb8] px-3 py-2 text-sm font-bold text-[#b84339] hover:bg-red-50" data-id="${g.id}">Eliminar</button></article>`,
     )
     .join("");
-  $("#playersBody").innerHTML = ranked
+  const playersSortMode = $("#playerSortSelect")?.value || "alphabetic";
+  const orderedPlayers = sortPlayers(db.players, playersSortMode);
+  $("#playersBody").innerHTML = orderedPlayers
     .map(
       (p) =>
         `<article class="panel flex items-center justify-between rounded-xl p-4"><div><b>${esc(p.name)}</b><p class="text-sm text-[#766b5f]">Elo ${p.elo} · Inicial ${p.initialElo} · ${p.games} partidas</p></div><div class="flex gap-3"><button class="editPlayer text-sm font-bold text-coral" data-id="${p.id}">Editar</button><button class="deletePlayer text-sm font-bold text-[#b84339]" data-id="${p.id}">Eliminar</button></div></article>`,
@@ -214,8 +259,17 @@ function participantInputs() {
   const count = +$("#playerCount").value;
   $("#participantFields").innerHTML = Array.from(
     { length: count },
-    (_, i) =>
-      `<label class="block text-sm font-bold">${i + 1}. puesto<select class="participant mt-1 w-full rounded-lg border border-[#cbb99f] bg-white p-3">${db.players.map((p) => `<option value="${p.id}">${esc(p.name)} (Elo ${p.elo})</option>`).join("")}</select></label>`,
+    (_, i) => {
+      const label = i === 0 ? "Ganador" : `Perdedor ${i}`;
+      const options = [
+        '<option value="">Selecciona jugador</option>',
+        ...db.players.map(
+          (p) => `<option value="${p.id}">${esc(p.name)} (Elo ${p.elo})</option>`,
+        ),
+      ].join("");
+
+      return `<label class="block text-sm font-bold">${label}<select class="participant mt-1 w-full rounded-lg border border-[#cbb99f] bg-white p-3">${options}</select></label>`;
+    },
   ).join("");
 }
 
@@ -380,11 +434,12 @@ $("#newGameBtn").onclick = () => {
   show("#gameModal");
 };
 $("#playerCount").onchange = participantInputs;
+$("#playerSortSelect").onchange = render;
 $("#saveGameBtn").onclick = async () => {
   if (!ensureCanEdit()) return;
-  const ids = [...document.querySelectorAll(".participant")].map(
-    (x) => x.value,
-  );
+  const ids = [...document.querySelectorAll(".participant")].map((x) => x.value.trim());
+  if (ids.some((id) => !id))
+    return toast("Selecciona un jugador para cada posición", true);
   if (new Set(ids).size !== ids.length)
     return toast("No repitas jugadores", true);
   const deckId = $("#deckSelect").value;
