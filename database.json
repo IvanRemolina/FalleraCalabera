@@ -102,6 +102,11 @@
       "id": "f499035f-48a7-44b5-a851-6207604ff52f",
       "name": "Fallera Original",
       "maxEdition": 4
+    },
+    {
+      "id": "0d0a650c-39f4-4cd2-a440-e3b62ff7acd4",
+      "name": "Fallera Deluxe",
+      "maxEdition": 4
     }
   ]
 }
