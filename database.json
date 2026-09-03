@@ -84,6 +84,15 @@
       "wins": 0,
       "losses": 0,
       "games": 0
+    },
+    {
+      "id": "b050d3d8-995e-4c37-a3d2-26fb2351cb3d",
+      "name": "Angelo",
+      "initialElo": 37,
+      "elo": 37,
+      "wins": 0,
+      "losses": 0,
+      "games": 0
     }
   ],
   "games": [],
