@@ -75,6 +75,15 @@
       "wins": 0,
       "losses": 0,
       "games": 0
+    },
+    {
+      "id": "599cd206-6510-438a-8fc1-b7b3c2181add",
+      "name": "Cristian",
+      "initialElo": 77,
+      "elo": 77,
+      "wins": 0,
+      "losses": 0,
+      "games": 0
     }
   ],
   "games": [],
