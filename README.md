@@ -11,7 +11,6 @@ Clasificación Elo para partidas de **La Fallera Calavera**. La aplicación perm
 - Historial de partidas con opción de eliminar resultados.
 - Alta, edición y eliminación de jugadores.
 - Recalculado cronológico de la puntuación Elo usando una amplitud de 400 y `K = 25`.
-- Modo local mediante `localStorage`.
 - Sincronización opcional con `database.json` en GitHub y actualización automática cada 5 segundos.
 
 ## Uso local
@@ -72,10 +71,6 @@ El historial de partidas es la fuente de verdad. El Elo y las estadísticas se r
 - Si dos personas guardan cambios al mismo tiempo, ambas pueden partir de una versión antigua del archivo y una escritura puede ser rechazada por conflicto. Para el uso casero previsto, conviene que solo una persona edite a la vez.
 
 La contraseña `fallera` está incluida en el JavaScript público y no es una medida de seguridad. El token sí permite escribir en el repositorio, por lo que nunca debe publicarse en `BUILT_IN_TOKEN` ni compartirse.
-
-## Modo local
-
-Pulsa **Modo local** en la configuración para trabajar sin GitHub. Los cambios se guardan en el navegador mediante `localStorage` y no se comparten con otros dispositivos. Si se borra el almacenamiento del navegador, se perderán esos cambios locales.
 
 ## Datos
 

@@ -421,7 +421,7 @@ async function github(method = "GET", path = "", body) {
 async function persist(message) {
   const c = config();
   if (!c?.token) {
-    toast("Guardado en modo local");
+    toast("Modo solo lectura: falta configurar el token", true);
     return;
   }
   $("#syncStatus").textContent = "Sincronizando…";
@@ -522,18 +522,6 @@ $("#saveSettingsBtn").onclick = () => {
   loadRemote();
 };
 
-$("#localModeBtn").onclick = () => {
-  localStorage.removeItem(KEY);
-  show("#settingsModal", false);
-  db = JSON.parse(localStorage.getItem("fallera-local") || "null") || blank();
-  db.players ??= [];
-  db.games ??= [];
-  db.decks ??= [];
-  normalizeDecks();
-  render();
-  toast("Modo local activado");
-};
-
 $("#refreshBtn").onclick = () => loadRemote();
 $("#newGameBtn").onclick = () => {
   if (!ensureCanEdit()) return;
@@ -571,7 +559,6 @@ $("#saveGameBtn").onclick = async () => {
     const player = db.players.find((p) => p.id === id);
     if (player) player.lastGame = db.games.at(-1).date;
   });
-  localStorage.setItem("fallera-local", JSON.stringify(db));
   show("#gameModal", false);
   render();
   await persist("Registrar partida");
@@ -597,7 +584,6 @@ $("#saveDeckBtn").onclick = async () => {
   const deck = { id: editingDeckId || crypto.randomUUID(), name, maxEdition };
   if (existing) db.decks[db.decks.indexOf(existing)] = deck;
   else db.decks.push(deck);
-  localStorage.setItem("fallera-local", JSON.stringify(db));
   show("#deckModal", false);
   render();
   await persist(existing ? "Modificar baraja" : "Añadir baraja");
@@ -631,7 +617,6 @@ $("#savePlayerBtn").onclick = async () => {
       losses: 0,
       games: 0,
     });
-  localStorage.setItem("fallera-local", JSON.stringify(db));
   show("#playerModal", false);
   render();
   await persist(editingId ? "Modificar jugador" : "Añadir jugador");
@@ -670,7 +655,6 @@ document.addEventListener("click", async (e) => {
     confirm("¿Eliminar esta partida y recalcular la clasificación?")
   ) {
     db.games = db.games.filter((g) => g.id !== dg.dataset.id);
-    localStorage.setItem("fallera-local", JSON.stringify(db));
     render();
     await persist("Eliminar partida");
   }
@@ -682,7 +666,6 @@ document.addEventListener("click", async (e) => {
   ) {
     db.players = db.players.filter((p) => p.id !== dp.dataset.id);
     db.games = db.games.filter((g) => !g.players.includes(dp.dataset.id));
-    localStorage.setItem("fallera-local", JSON.stringify(db));
     render();
     await persist("Eliminar jugador");
   }
@@ -703,7 +686,6 @@ document.addEventListener("click", async (e) => {
     if (isUsed) return toast("No puedes eliminar una baraja ya usada", true);
     if (!confirm("¿Eliminar esta baraja?")) return;
     db.decks = db.decks.filter((deck) => deck.id !== dd.dataset.id);
-    localStorage.setItem("fallera-local", JSON.stringify(db));
     render();
     await persist("Eliminar baraja");
   }
