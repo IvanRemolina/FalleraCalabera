@@ -26,6 +26,15 @@
       "wins": 0,
       "losses": 0,
       "games": 0
+    },
+    {
+      "id": "ab787fe0-fd2f-474e-8058-250cccc93859",
+      "name": "aa",
+      "initialElo": 100,
+      "elo": 100,
+      "wins": 0,
+      "losses": 0,
+      "games": 0
     }
   ],
   "games": []
