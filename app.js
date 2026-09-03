@@ -305,15 +305,14 @@ function render() {
   $("#historyBody").innerHTML = [...db.games]
     .sort((a, b) => new Date(b.date) - new Date(a.date))
     .map(
-      (g) =>
-        `<article class="panel flex items-center justify-between gap-4 rounded-xl p-4"><div><p class="text-xs font-bold uppercase tracking-wider text-[#766b5f]">${dateText(g.date)} · ${combinationLabel(db.decks.find((deck) => deck.id === g.deckId), g.editions || g.combinationId)}</p><p class="mt-1 font-bold">${g.players
-          .map((id, i) => {
-            const p = db.players.find((x) => x.id === id);
-            return `<span class="text-coral">${i + 1}.</span> ${esc(p?.name || "Jugador eliminado")}`;
-          })
-          .join(
-            " &nbsp; ",
-          )}</p></div><button class="deleteGame rounded-lg border border-[#ddcdb8] px-3 py-2 text-sm font-bold text-[#b84339] hover:bg-red-50" data-id="${g.id}">Eliminar</button></article>`,
+      (g) => {
+        const winner = db.players.find((player) => player.id === g.players[0]);
+        const losers = g.players
+          .slice(1)
+          .map((id) => db.players.find((player) => player.id === id))
+          .sort((a, b) => (a?.name || "").localeCompare(b?.name || "", "es"));
+        return `<article class="panel flex items-center justify-between gap-4 rounded-xl p-4"><div><p class="text-xs font-bold uppercase tracking-wider text-[#766b5f]">${dateText(g.date)} · ${combinationLabel(db.decks.find((deck) => deck.id === g.deckId), g.editions || g.combinationId)}</p><p class="mt-2"><strong class="text-coral">Ganador:</strong> <b>${esc(winner?.name || "Jugador eliminado")}</b></p><p class="mt-1"><strong>Perdedores:</strong> ${losers.map((player) => esc(player?.name || "Jugador eliminado")).join(", ")}</p></div><button class="deleteGame rounded-lg border border-[#ddcdb8] px-3 py-2 text-sm font-bold text-[#b84339] hover:bg-red-50" data-id="${g.id}">Eliminar</button></article>`;
+      },
     )
     .join("");
   const playersSortMode = $("#playerSortSelect")?.value || "alphabetic";
@@ -573,7 +572,7 @@ $("#saveGameBtn").onclick = async () => {
   });
   show("#gameModal", false);
   render();
-  await persist("Registrar partida");
+  await persist("Registrar partidas");
 };
 function openDeckModal() {
   if (!ensureCanEdit()) return;
