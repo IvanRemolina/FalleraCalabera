@@ -15,6 +15,7 @@ const blank = () => ({ players: [], games: [], decks: [] });
 let db = blank(),
   editingId = null,
   editingDeckId = null,
+  editingGameId = null,
   syncInProgress = false,
   syncTimer = null;
 const $ = (s) => document.querySelector(s),
@@ -311,7 +312,7 @@ function render() {
           .slice(1)
           .map((id) => db.players.find((player) => player.id === id))
           .sort((a, b) => (a?.name || "").localeCompare(b?.name || "", "es"));
-        return `<article class="panel flex items-center justify-between gap-4 rounded-xl p-4"><div><p class="text-xs font-bold uppercase tracking-wider text-[#766b5f]">${dateText(g.date)} · ${combinationLabel(db.decks.find((deck) => deck.id === g.deckId), g.editions || g.combinationId)}</p><p class="mt-2"><strong class="text-coral">Ganador:</strong> <b>${esc(winner?.name || "Jugador eliminado")}</b></p><p class="mt-1"><strong>Perdedores:</strong> ${losers.map((player) => esc(player?.name || "Jugador eliminado")).join(", ")}</p></div><button class="deleteGame rounded-lg border border-[#ddcdb8] px-3 py-2 text-sm font-bold text-[#b84339] hover:bg-red-50" data-id="${g.id}">Eliminar</button></article>`;
+        return `<article class="panel flex items-center justify-between gap-4 rounded-xl p-4"><div><p class="text-xs font-bold uppercase tracking-wider text-[#766b5f]">${dateText(g.date)} · ${combinationLabel(db.decks.find((deck) => deck.id === g.deckId), g.editions || g.combinationId)}</p><p class="mt-2"><strong class="text-coral">Ganador:</strong> <b>${esc(winner?.name || "Jugador eliminado")}</b></p><p class="mt-1"><strong>Perdedores:</strong> ${losers.map((player) => esc(player?.name || "Jugador eliminado")).join(", ")}</p></div><div class="flex gap-3"><button class="editGame text-sm font-bold text-coral" data-id="${g.id}">Editar</button><button class="deleteGame rounded-lg border border-[#ddcdb8] px-3 py-2 text-sm font-bold text-[#b84339] hover:bg-red-50" data-id="${g.id}">Eliminar</button></div></article>`;
       },
     )
     .join("");
