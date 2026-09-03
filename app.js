@@ -353,11 +353,14 @@ function editionInputs() {
 
 function participantInputs() {
   const count = +$("#playerCount").value;
+  const selectedIds = [...document.querySelectorAll(".participant")].map(
+    (select) => select.value,
+  );
   const players = [...db.players].sort((a, b) => a.name.localeCompare(b.name, "es"));
   $("#participantFields").innerHTML = Array.from(
     { length: count },
     (_, i) => {
-      const label = i === 0 ? "Ganador" : `Perdedor ${i}`;
+      const label = `Participante ${i + 1}`;
       const options = [
         '<option value="">Selecciona jugador</option>',
         ...players.map(
@@ -365,8 +368,26 @@ function participantInputs() {
         ),
       ].join("");
 
-      return `<label class="block text-sm font-bold">${label}<select class="participant mt-1 w-full rounded-lg border border-[#cbb99f] bg-white p-3">${options}</select></label>`;
+      return `<label class="block text-sm font-bold">${label}<select class="participant mt-1 w-full rounded-lg border border-[#cbb99f] bg-white p-3">${options.replace(`<option value="${selectedIds[i]}">`, `<option value="${selectedIds[i]}" selected>` )}</select></label>`;
     },
+  ).join("");
+  winnerInputs();
+}
+
+function winnerInputs() {
+  const gameCount = +$("#gameCountInput").value;
+  const options = [...document.querySelectorAll(".participant")]
+    .map((select) => select.value)
+    .filter(Boolean)
+    .map((id) => db.players.find((player) => player.id === id))
+    .filter(Boolean)
+    .sort((a, b) => a.name.localeCompare(b.name, "es"));
+  const playerOptions = options.length
+    ? `<option value="">Selecciona ganador</option>${options.map((player) => `<option value="${player.id}">${esc(player.name)}</option>`).join("")}`
+    : '<option value="">Selecciona primero los participantes</option>';
+  $("#winnerFields").innerHTML = Array.from(
+    { length: gameCount },
+    (_, index) => `<label class="block text-sm font-bold">Ganador partida ${index + 1}<select class="winner-select mt-1 w-full rounded-lg border border-[#cbb99f] bg-white p-3">${playerOptions}</select></label>`,
   ).join("");
 }
 
@@ -514,12 +535,15 @@ $("#newGameBtn").onclick = () => {
   if (!ensureCanEdit()) return;
   if (db.players.length < 2)
     return toast("Necesitas al menos 2 jugadores", true);
+  $("#gameCountInput").value = 1;
   $("#playerCount").value = 2;
   deckInputs();
   participantInputs();
   show("#gameModal");
 };
 $("#playerCount").onchange = participantInputs;
+$("#gameCountInput").onchange = winnerInputs;
+$("#participantFields").onchange = winnerInputs;
 $("#playerSortSelect").onchange = render;
 $("#evolutionStart").onchange = renderEvolution;
 $("#evolutionEnd").onchange = renderEvolution;
@@ -527,24 +551,25 @@ $("#saveGameBtn").onclick = async () => {
   if (!ensureCanEdit()) return;
   const ids = [...document.querySelectorAll(".participant")].map((x) => x.value.trim());
   if (ids.some((id) => !id))
-    return toast("Selecciona un jugador para cada posición", true);
+    return toast("Selecciona todos los participantes", true);
   if (new Set(ids).size !== ids.length)
     return toast("No repitas jugadores", true);
   const deckId = $("#deckSelect").value;
   const editions = [...document.querySelectorAll(".edition-check:checked")].map((input) => Number(input.value));
   if (!deckId || !editions.length)
     return toast("Selecciona una baraja y al menos una edición", true);
-  db.games.push({
-    id: crypto.randomUUID(),
-    date: new Date().toISOString(),
-    players: ids,
-    deckId,
-    editions,
-  });
-  // Solo los participantes deben mostrar esta partida como la última jugada.
-  ids.forEach((id) => {
-    const player = db.players.find((p) => p.id === id);
-    if (player) player.lastGame = db.games.at(-1).date;
+  const winners = [...document.querySelectorAll(".winner-select")].map((select) => select.value);
+  if (winners.some((id) => !id))
+    return toast("Selecciona el ganador de cada partida", true);
+  const now = Date.now();
+  winners.forEach((winnerId, index) => {
+    const players = [winnerId, ...ids.filter((id) => id !== winnerId)];
+    const date = new Date(now + index).toISOString();
+    db.games.push({ id: crypto.randomUUID(), date, players, deckId, editions });
+    players.forEach((id) => {
+      const player = db.players.find((item) => item.id === id);
+      if (player) player.lastGame = date;
+    });
   });
   show("#gameModal", false);
   render();
