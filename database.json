@@ -4,21 +4,21 @@
       "id": "67c09732-9889-4122-afee-32f275f4d0b3",
       "name": "pepe",
       "initialElo": 100,
-      "elo": 119,
-      "wins": 1,
+      "elo": 135,
+      "wins": 2,
       "losses": 0,
-      "games": 1,
-      "lastGame": "2026-09-03T11:28:33.536Z"
+      "games": 2,
+      "lastGame": "2026-09-03T11:39:30.796Z"
     },
     {
       "id": "a7c96f2a-0d04-4440-a434-ba36fb0c9215",
       "name": "juan",
       "initialElo": 100,
-      "elo": 111,
+      "elo": 102,
       "wins": 1,
-      "losses": 1,
-      "games": 2,
-      "lastGame": "2026-09-03T11:28:33.536Z"
+      "losses": 2,
+      "games": 3,
+      "lastGame": "2026-09-03T11:39:30.796Z"
     },
     {
       "id": "09ca176c-5b7a-4ed0-aac7-719d72831700",
@@ -28,17 +28,17 @@
       "wins": 0,
       "losses": 2,
       "games": 2,
-      "lastGame": "2026-09-03T11:28:33.536Z"
+      "lastGame": "2026-09-03T11:39:30.796Z"
     },
     {
       "id": "ab787fe0-fd2f-474e-8058-250cccc93859",
       "name": "aa",
       "initialElo": 100,
-      "elo": 86,
+      "elo": 79,
       "wins": 0,
-      "losses": 2,
-      "games": 2,
-      "lastGame": "2026-09-03T11:28:33.536Z"
+      "losses": 3,
+      "games": 3,
+      "lastGame": "2026-09-03T11:39:30.796Z"
     }
   ],
   "games": [
@@ -58,6 +58,15 @@
       "players": [
         "a7c96f2a-0d04-4440-a434-ba36fb0c9215",
         "09ca176c-5b7a-4ed0-aac7-719d72831700",
+        "ab787fe0-fd2f-474e-8058-250cccc93859"
+      ]
+    },
+    {
+      "id": "2cbe377e-f790-4bad-82a2-5ff1ffc2480e",
+      "date": "2026-09-03T11:39:30.796Z",
+      "players": [
+        "67c09732-9889-4122-afee-32f275f4d0b3",
+        "a7c96f2a-0d04-4440-a434-ba36fb0c9215",
         "ab787fe0-fd2f-474e-8058-250cccc93859"
       ]
     }
