@@ -48,6 +48,15 @@
       "wins": 0,
       "losses": 0,
       "games": 0
+    },
+    {
+      "id": "8b69ea21-161b-4151-800d-0472c0041924",
+      "name": "Uriel",
+      "initialElo": 135,
+      "elo": 135,
+      "wins": 0,
+      "losses": 0,
+      "games": 0
     }
   ],
   "games": [],
