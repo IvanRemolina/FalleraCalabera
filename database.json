@@ -26,15 +26,6 @@
       "wins": 0,
       "losses": 0,
       "games": 0
-    },
-    {
-      "id": "f139e346-c51a-4159-8033-3cf0fd7fb0c1",
-      "name": "maria",
-      "initialElo": 100,
-      "elo": 100,
-      "wins": 0,
-      "losses": 0,
-      "games": 0
     }
   ],
   "games": []
