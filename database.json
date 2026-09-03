@@ -97,5 +97,45 @@
     }
   ],
   "games": [],
-  "decks": []
+  "decks": [
+    {
+      "id": "09bee672-56b4-43fb-afab-0b9a603ee63c",
+      "name": "Fallera",
+      "version": "Original",
+      "units": [
+        {
+          "id": "2b44c60e-d853-43f3-9fc6-49dcb9cc66cf",
+          "name": "1"
+        },
+        {
+          "id": "b93bd72c-1c1f-471a-8f3a-6044dd48c900",
+          "name": "2"
+        },
+        {
+          "id": "c35a60fc-a6e0-4f2d-80ef-deab77be8ecb",
+          "name": "3"
+        },
+        {
+          "id": "0ae15763-8e7c-4a5a-a4d7-e431357f92f2",
+          "name": "4"
+        }
+      ],
+      "combinations": [
+        {
+          "id": "27af67bb-38bc-4571-a693-5a99353f8f0e",
+          "name": "1",
+          "units": [
+            "2b44c60e-d853-43f3-9fc6-49dcb9cc66cf"
+          ]
+        },
+        {
+          "id": "75212944-7453-4814-93fa-8e09bfe1f4ae",
+          "name": "1",
+          "units": [
+            "b93bd72c-1c1f-471a-8f3a-6044dd48c900"
+          ]
+        }
+      ]
+    }
+  ]
 }
