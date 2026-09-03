@@ -1,1 +1,55 @@
-body{background:#f4eadb;color:#24211e;background-image:radial-gradient(#d6c7b1 1px,transparent 1px);background-size:22px 22px}.panel{background:rgba(255,248,237,.94);border:1px solid #ddcdb8;box-shadow:4px 4px 0 #d7c2a8}.tab.active{color:#c74438;border-bottom:3px solid #e95d4f}.rank{font-family:Georgia,serif}.modal{background:rgba(36,33,30,.55)}input,select{outline:none}input:focus,select:focus{border-color:#e95d4f;box-shadow:0 0 0 3px #e95d4f22}.toast{animation:in .2s ease-out}@keyframes in{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
+/* Base de la página y textura de fondo. */
+body {
+  background: #f4eadb;
+  color: #24211e;
+  background-image: radial-gradient(#d6c7b1 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* Paneles con el estilo visual común de la aplicación. */
+.panel {
+  background: rgba(255, 248, 237, 0.94);
+  border: 1px solid #ddcdb8;
+  box-shadow: 4px 4px 0 #d7c2a8;
+}
+
+/* Estado activo de las pestañas. */
+.tab.active {
+  color: #c74438;
+  border-bottom: 3px solid #e95d4f;
+}
+
+.rank {
+  font-family: Georgia, serif;
+}
+
+/* Fondo y campos de los cuadros de diálogo. */
+.modal {
+  background: rgba(36, 33, 30, 0.55);
+}
+input,
+select {
+  outline: none;
+}
+
+/* Realce de foco para navegación con teclado. */
+input:focus,
+select:focus {
+  border-color: #e95d4f;
+  box-shadow: 0 0 0 3px #e95d4f22;
+}
+
+/* Entrada breve del aviso emergente. */
+.toast {
+  animation: in 0.2s ease-out;
+}
+@keyframes in {
+  from {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
