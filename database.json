@@ -58,5 +58,12 @@
         "ab787fe0-fd2f-474e-8058-250cccc93859"
       ]
     }
+  ],
+  "decks": [
+    {
+      "id": "8a04a135-7649-48c0-9f16-b41baeb4da4b",
+      "name": "Fallera Delux",
+      "version": "1"
+    }
   ]
 }
