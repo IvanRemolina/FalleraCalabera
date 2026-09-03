@@ -347,19 +347,20 @@ function editionInputs() {
   const deck = db.decks.find((item) => item.id === $("#deckSelect").value);
   const maxEdition = deck?.maxEdition || 0;
   $("#editionChecks").innerHTML = maxEdition
-    ? `<p class="mb-2 text-sm font-bold">Ediciones incluidas</p><div class="edition-options">${Array.from({ length: maxEdition }, (_, index) => `<label class="edition-option"><input class="edition-check" type="checkbox" value="${index + 1}" ${index === 0 ? "checked" : ""}/><span>${index + 1}</span></label>`).join("")}</div>`
+    ? `<p class="mb-2 text-sm font-bold">Ediciones incluidas</p><div class="edition-options">${Array.from({ length: maxEdition }, (_, index) => `<label class="edition-option"><input class="edition-check" type="checkbox" value="${index + 1}" ${index === 0 ? "checked disabled" : ""}/><span>${index + 1}</span></label>`).join("")}</div>`
     : '<p class="text-sm text-[#766b5f]">Selecciona una baraja</p>';
 }
 
 function participantInputs() {
   const count = +$("#playerCount").value;
+  const players = [...db.players].sort((a, b) => a.name.localeCompare(b.name, "es"));
   $("#participantFields").innerHTML = Array.from(
     { length: count },
     (_, i) => {
       const label = i === 0 ? "Ganador" : `Perdedor ${i}`;
       const options = [
         '<option value="">Selecciona jugador</option>',
-        ...db.players.map(
+        ...players.map(
           (p) => `<option value="${p.id}">${esc(p.name)} (Elo ${p.elo})</option>`,
         ),
       ].join("");
