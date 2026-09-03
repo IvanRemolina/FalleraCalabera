@@ -12,7 +12,7 @@ const APP_PASSWORD = "fallera";
 const SYNC_INTERVAL = 5000;
 
 // Estado en memoria de la aplicación y referencias a la sincronización activa.
-const blank = () => ({ players: [], games: [] });
+const blank = () => ({ players: [], games: [], decks: [] });
 let db = blank(),
   editingId = null,
   syncInProgress = false,
@@ -41,6 +41,7 @@ const config = () => ({
     "",
 });
 function ensureAccess() {
+  // Esta contraseña solo evita ediciones accidentales; no sustituye al token.
   if (localStorage.getItem(AUTH_KEY) === "yes") return true;
   const password = prompt("Contraseña de la partida");
   if (password !== APP_PASSWORD) {
@@ -86,10 +87,23 @@ function dateText(iso) {
   });
 }
 
+function deckLabel(deck) {
+  if (!deck) return "Baraja no especificada";
+  return deck.version ? `${deck.name} · ${deck.version}` : deck.name;
+}
+
 // Fórmula multinomial equivalente a la hoja de cálculo: amplitud 400 y K=25.
 function expected(elo, participantElos) {
   const weights = participantElos.map((rating) => 10 ** (rating / 400));
   return 10 ** (elo / 400) / weights.reduce((sum, weight) => sum + weight, 0);
+}
+
+// La hoja de cálculo aplica un mínimo de un punto a cada cambio redondeado.
+function applyEloChange(elo, change) {
+  const roundedChange = Math.round(change);
+  const minimumChange = Math.max(1, Math.abs(roundedChange));
+  // El mínimo de un punto puede hacer que el total se desvíe ligeramente.
+  return elo + Math.sign(change) * minimumChange;
 }
 
 // El historial es la fuente de verdad: primero se reinician las estadísticas y
@@ -115,7 +129,7 @@ function recalculate() {
       changes.push([p, 25 * (result - probability), place]);
     });
     changes.forEach(([p, change, place]) => {
-      p.elo = Math.round((ratings.get(p.id) ?? p.elo) + change);
+      p.elo = applyEloChange(ratings.get(p.id) ?? p.elo, change);
       p.games++;
       if (place === 0) p.wins++;
       else p.losses++;
@@ -126,6 +140,14 @@ function recalculate() {
 function render() {
   recalculate();
   const ranked = [...db.players].sort((a, b) => b.elo - a.elo);
+  const baselineElo = ranked.length * 100;
+  const totalElo = ranked.reduce((sum, player) => sum + player.elo, 0);
+  const deviation = totalElo - baselineElo;
+  const deviationPercent = baselineElo ? (deviation / baselineElo) * 100 : 0;
+  const signedDeviation = deviation > 0 ? "+" : "";
+  const signedDeviationPercent = deviationPercent > 0 ? "+" : "";
+  $("#eloDeviation").textContent =
+    `Desviación: ${signedDeviation}${deviation} / ${signedDeviationPercent}${deviationPercent.toLocaleString("es-ES", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`;
   $("#emptyRanking").classList.toggle("hidden", ranked.length > 0);
   $("#rankingBody").innerHTML = ranked
     .map(
@@ -139,7 +161,7 @@ function render() {
     .sort((a, b) => new Date(b.date) - new Date(a.date))
     .map(
       (g) =>
-        `<article class="panel flex items-center justify-between gap-4 rounded-xl p-4"><div><p class="text-xs font-bold uppercase tracking-wider text-[#766b5f]">${dateText(g.date)}</p><p class="mt-1 font-bold">${g.players
+        `<article class="panel flex items-center justify-between gap-4 rounded-xl p-4"><div><p class="text-xs font-bold uppercase tracking-wider text-[#766b5f]">${dateText(g.date)} · ${deckLabel(db.decks.find((deck) => deck.id === g.deckId))}</p><p class="mt-1 font-bold">${g.players
           .map((id, i) => {
             const p = db.players.find((x) => x.id === id);
             return `<span class="text-coral">${i + 1}.</span> ${esc(p?.name || "Jugador eliminado")}`;
@@ -155,6 +177,24 @@ function render() {
         `<article class="panel flex items-center justify-between rounded-xl p-4"><div><b>${esc(p.name)}</b><p class="text-sm text-[#766b5f]">Elo ${p.elo} · Inicial ${p.initialElo} · ${p.games} partidas</p></div><div class="flex gap-3"><button class="editPlayer text-sm font-bold text-coral" data-id="${p.id}">Editar</button><button class="deletePlayer text-sm font-bold text-[#b84339]" data-id="${p.id}">Eliminar</button></div></article>`,
     )
     .join("");
+  $("#decksBody").innerHTML = db.decks
+    .map(
+      (deck) =>
+        `<article class="panel flex items-center justify-between rounded-xl p-4"><div><b>${esc(deckLabel(deck))}</b><p class="text-sm text-[#766b5f]">${db.games.filter((game) => game.deckId === deck.id).length} partidas</p></div><button class="deleteDeck text-sm font-bold text-[#b84339]" data-id="${deck.id}">Eliminar</button></article>`,
+    )
+    .join("");
+}
+
+function deckInputs() {
+  $("#deckSelect").innerHTML = db.decks.length
+    ? db.decks
+        .map(
+          (deck) =>
+            `<option value="${deck.id}">${esc(deckLabel(deck))}</option>`,
+        )
+        .join("")
+    : '<option value="">Sin barajas: añade una primero</option>';
+  $("#deckSelect").disabled = !db.decks.length;
 }
 
 function participantInputs() {
@@ -221,6 +261,7 @@ async function persist(message) {
     );
     const payload = { message, content, branch: c.branch || "main" };
     if (remote?.sha) payload.sha = remote.sha;
+    // GitHub versiona cada PUT como un commit; Pages puede desplegarlo después.
     await github("PUT", "database.json", payload);
     $("#syncStatus").textContent = "Sincronizado con GitHub";
     toast("Cambios guardados en GitHub");
@@ -241,6 +282,7 @@ async function loadRemote(silent = false) {
     );
     db.players ??= [];
     db.games ??= [];
+    db.decks ??= [];
     render();
     $("#syncStatus").textContent =
       "Sincronizado · " +
@@ -301,6 +343,9 @@ $("#localModeBtn").onclick = () => {
   localStorage.removeItem(KEY);
   show("#settingsModal", false);
   db = JSON.parse(localStorage.getItem("fallera-local") || "null") || blank();
+  db.players ??= [];
+  db.games ??= [];
+  db.decks ??= [];
   render();
   toast("Modo local activado");
 };
@@ -311,6 +356,7 @@ $("#newGameBtn").onclick = () => {
   if (db.players.length < 2)
     return toast("Necesitas al menos 2 jugadores", true);
   $("#playerCount").value = 2;
+  deckInputs();
   participantInputs();
   show("#gameModal");
 };
@@ -322,16 +368,42 @@ $("#saveGameBtn").onclick = async () => {
   );
   if (new Set(ids).size !== ids.length)
     return toast("No repitas jugadores", true);
+  const deckId = $("#deckSelect").value;
+  if (!deckId) return toast("Selecciona o añade una baraja", true);
   db.games.push({
     id: crypto.randomUUID(),
     date: new Date().toISOString(),
     players: ids,
+    deckId,
   });
-  db.players.forEach((p) => (p.lastGame = db.games.at(-1).date));
+  // Solo los participantes deben mostrar esta partida como la última jugada.
+  ids.forEach((id) => {
+    const player = db.players.find((p) => p.id === id);
+    if (player) player.lastGame = db.games.at(-1).date;
+  });
   localStorage.setItem("fallera-local", JSON.stringify(db));
   show("#gameModal", false);
   render();
   await persist("Registrar partida");
+};
+function openDeckModal() {
+  if (!ensureCanEdit()) return;
+  $("#deckName").value = "";
+  $("#deckVersion").value = "";
+  show("#deckModal");
+}
+$("#addDeckBtn").onclick = openDeckModal;
+$("#manageDeckBtn").onclick = openDeckModal;
+$("#saveDeckBtn").onclick = async () => {
+  if (!ensureCanEdit()) return;
+  const name = $("#deckName").value.trim();
+  const version = $("#deckVersion").value.trim();
+  if (!name) return toast("Escribe un nombre para la baraja", true);
+  db.decks.push({ id: crypto.randomUUID(), name, version });
+  localStorage.setItem("fallera-local", JSON.stringify(db));
+  show("#deckModal", false);
+  render();
+  await persist("Añadir baraja");
 };
 $("#addPlayerBtn").onclick = () => {
   if (!ensureCanEdit()) return;
@@ -378,7 +450,7 @@ document.addEventListener("click", async (e) => {
       .querySelectorAll(".tab")
       .forEach((x) => x.classList.remove("active"));
     tab.classList.add("active");
-    ["ranking", "history", "players"].forEach((v) =>
+    ["ranking", "history", "players", "decks"].forEach((v) =>
       $("#" + v + "View").classList.toggle("hidden", v !== tab.dataset.view),
     );
   }
@@ -416,6 +488,16 @@ document.addEventListener("click", async (e) => {
     localStorage.setItem("fallera-local", JSON.stringify(db));
     render();
     await persist("Eliminar jugador");
+  }
+  const dd = e.target.closest(".deleteDeck");
+  if (dd && ensureCanEdit()) {
+    const isUsed = db.games.some((game) => game.deckId === dd.dataset.id);
+    if (isUsed) return toast("No puedes eliminar una baraja ya usada", true);
+    if (!confirm("¿Eliminar esta baraja?")) return;
+    db.decks = db.decks.filter((deck) => deck.id !== dd.dataset.id);
+    localStorage.setItem("fallera-local", JSON.stringify(db));
+    render();
+    await persist("Eliminar baraja");
   }
 });
 loadRemote();

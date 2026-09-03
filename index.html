@@ -1,27 +1,345 @@
 <!doctype html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Fallera Elo</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>tailwind.config={theme:{extend:{fontFamily:{display:['Georgia','serif'],sans:['ui-sans-serif','system-ui']},colors:{ink:'#24211e',coral:'#e95d4f',cream:'#fff8ed',sage:'#6d8765'}}}};</script>
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body class="min-h-screen font-sans">
-  <header class="border-b border-[#ddcdb8] bg-[#fff8ed]/90 backdrop-blur"><div class="mx-auto flex max-w-6xl items-center justify-between px-5 py-5"><div><p class="text-xs font-bold uppercase tracking-[.25em] text-coral">La Fallera Calavera</p><h1 class="font-display text-3xl font-bold">Elo de la colla</h1></div><button id="settingsBtn" class="rounded-lg border border-[#cbb99f] px-3 py-2 text-sm font-semibold hover:bg-white" title="Configuración">⚙ Configuración</button></div></header>
-  <main class="mx-auto max-w-6xl px-5 py-8">
-    <div id="notice" class="mb-5 hidden rounded-lg border px-4 py-3 text-sm"></div>
-    <div class="mb-7 flex flex-wrap items-end justify-between gap-4"><div><p class="text-sm text-[#766b5f]">Clasificación viva</p><h2 class="font-display text-4xl font-bold">La mesa manda</h2></div><button id="newGameBtn" class="rounded-lg bg-coral px-5 py-3 font-bold text-white shadow-[3px_3px_0_#b84339] hover:translate-y-px hover:shadow-[2px_2px_0_#b84339]">＋ Nueva partida</button></div>
-    <nav class="mb-5 flex gap-6 border-b border-[#ddcdb8] text-sm font-bold"><button class="tab active pb-3" data-view="ranking">Clasificación</button><button class="tab pb-3" data-view="history">Historial <span id="gameCount"></span></button><button class="tab pb-3" data-view="players">Jugadores</button></nav>
-    <section id="rankingView"><div class="mb-4 flex items-center justify-between"><p id="syncStatus" class="text-sm text-[#766b5f]">Sincronización no configurada</p><button id="refreshBtn" class="text-sm font-bold text-coral hover:underline">↻ Actualizar</button></div><div class="panel overflow-x-auto rounded-xl"><table class="w-full min-w-[650px] text-left text-sm"><thead class="border-b border-[#ddcdb8] text-xs uppercase tracking-wider text-[#766b5f]"><tr><th class="px-5 py-4"># Jugador</th><th>Elo</th><th>V</th><th>D</th><th>% victorias</th><th>Partidas</th><th>Última partida</th></tr></thead><tbody id="rankingBody"></tbody></table><div id="emptyRanking" class="hidden p-10 text-center text-[#766b5f]">Añade jugadores para empezar la partida.</div></div></section>
-    <section id="historyView" class="hidden"><div id="historyBody" class="space-y-3"></div><p id="emptyHistory" class="hidden py-12 text-center text-[#766b5f]">Todavía no hay partidas registradas.</p></section>
-    <section id="playersView" class="hidden"><div class="mb-4 flex justify-end"><button id="addPlayerBtn" class="rounded-lg border border-coral px-4 py-2 text-sm font-bold text-coral hover:bg-[#fff8ed]">＋ Añadir jugador</button></div><div id="playersBody" class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"></div></section>
-  </main>
-  <div id="gameModal" class="modal fixed inset-0 z-20 hidden items-center justify-center p-4"><div class="panel max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl p-6"><div class="mb-5 flex justify-between"><div><p class="text-xs font-bold uppercase tracking-wider text-coral">Resultado</p><h2 class="font-display text-2xl font-bold">Nueva partida</h2></div><button class="close text-2xl" data-close="gameModal">×</button></div><label class="mb-5 block text-sm font-bold">Jugadores participantes<select id="playerCount" class="mt-2 w-full rounded-lg border border-[#cbb99f] bg-white p-3"><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></label><div id="participantFields" class="space-y-3"></div><p class="mt-4 text-xs text-[#766b5f]">Ordena del primer puesto al último. El Elo se recalcula desde todo el historial.</p><button id="saveGameBtn" class="mt-6 w-full rounded-lg bg-coral px-4 py-3 font-bold text-white">Guardar partida</button></div></div>
-  <div id="playerModal" class="modal fixed inset-0 z-20 hidden items-center justify-center p-4"><div class="panel w-full max-w-md rounded-xl p-6"><div class="mb-5 flex justify-between"><h2 id="playerModalTitle" class="font-display text-2xl font-bold">Añadir jugador</h2><button class="close text-2xl" data-close="playerModal">×</button></div><label class="mb-4 block text-sm font-bold">Nombre<input id="playerName" class="mt-2 w-full rounded-lg border border-[#cbb99f] bg-white p-3" maxlength="40"></label><label class="block text-sm font-bold">Elo inicial<input id="playerElo" type="number" min="0" max="4000" value="100" class="mt-2 w-full rounded-lg border border-[#cbb99f] bg-white p-3"></label><button id="savePlayerBtn" class="mt-6 w-full rounded-lg bg-coral px-4 py-3 font-bold text-white">Guardar</button></div></div>
-  <div id="settingsModal" class="modal fixed inset-0 z-20 hidden items-center justify-center p-4"><div class="panel w-full max-w-lg rounded-xl p-6"><div class="mb-5 flex justify-between"><div><p class="text-xs font-bold uppercase tracking-wider text-coral">Persistencia</p><h2 class="font-display text-2xl font-bold">Configuración GitHub</h2></div><button class="close text-2xl" data-close="settingsModal">×</button></div><p class="mb-4 text-sm text-[#766b5f]">El repositorio ya está configurado para toda la partida. Tus amigos solo necesitan la contraseña de edición.</p><div class="grid gap-3 sm:grid-cols-2"><label class="text-sm font-bold">Propietario<input id="ghOwner" readonly class="mt-2 w-full rounded-lg border border-[#cbb99f] bg-[#f4eadb] p-3"></label><label class="text-sm font-bold">Repositorio<input id="ghRepo" readonly class="mt-2 w-full rounded-lg border border-[#cbb99f] bg-[#f4eadb] p-3"></label></div><label class="mt-3 block text-sm font-bold">Rama<input id="ghBranch" readonly value="main" class="mt-2 w-full rounded-lg border border-[#cbb99f] bg-[#f4eadb] p-3"></label><label class="mt-3 block text-sm font-bold">Token del propietario<input id="ghToken" type="password" class="mt-2 w-full rounded-lg border border-[#cbb99f] bg-white p-3" placeholder="Solo para configurar este navegador"></label><p class="mt-2 text-xs text-[#766b5f]">Para compartir sin GitHub, configura un token nuevo en <code>BUILT_IN_TOKEN</code> dentro de <code>app.js</code> antes de publicar.</p><div class="mt-5 flex gap-3"><button id="saveSettingsBtn" class="flex-1 rounded-lg bg-coral px-4 py-3 font-bold text-white">Guardar y cargar</button><button id="localModeBtn" class="rounded-lg border border-[#cbb99f] px-4 py-3 font-bold">Modo local</button></div></div></div>
-  <div id="toast" class="fixed bottom-5 right-5 hidden rounded-lg bg-[#24211e] px-4 py-3 text-sm font-bold text-white"></div>
-<script src="app.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fallera Elo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              display: ["Georgia", "serif"],
+              sans: ["ui-sans-serif", "system-ui"],
+            },
+            colors: {
+              ink: "#24211e",
+              coral: "#e95d4f",
+              cream: "#fff8ed",
+              sage: "#6d8765",
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="min-h-screen font-sans">
+    <header class="border-b border-[#ddcdb8] bg-[#fff8ed]/90 backdrop-blur">
+      <div
+        class="mx-auto flex max-w-6xl items-center justify-between px-5 py-5"
+      >
+        <div>
+          <p class="text-xs font-bold uppercase tracking-[.25em] text-coral">
+            La Fallera Calavera
+          </p>
+          <h1 class="font-display text-3xl font-bold">Elo de la colla</h1>
+        </div>
+        <button
+          id="settingsBtn"
+          class="rounded-lg border border-[#cbb99f] px-3 py-2 text-sm font-semibold hover:bg-white"
+          title="Configuración"
+        >
+          ⚙ Configuración
+        </button>
+      </div>
+    </header>
+    <main class="mx-auto max-w-6xl px-5 py-8">
+      <div
+        id="notice"
+        class="mb-5 hidden rounded-lg border px-4 py-3 text-sm"
+      ></div>
+      <div class="mb-7 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p class="text-sm text-[#766b5f]">Clasificación viva</p>
+          <h2 class="font-display text-4xl font-bold">La mesa manda</h2>
+        </div>
+        <button
+          id="newGameBtn"
+          class="rounded-lg bg-coral px-5 py-3 font-bold text-white shadow-[3px_3px_0_#b84339] hover:translate-y-px hover:shadow-[2px_2px_0_#b84339]"
+        >
+          ＋ Nueva partida
+        </button>
+      </div>
+      <nav class="mb-5 flex gap-6 border-b border-[#ddcdb8] text-sm font-bold">
+        <button class="tab active pb-3" data-view="ranking">
+          Clasificación</button
+        ><button class="tab pb-3" data-view="history">
+          Historial <span id="gameCount"></span></button
+        ><button class="tab pb-3" data-view="players">Jugadores</button
+        ><button class="tab pb-3" data-view="decks">Barajas</button>
+      </nav>
+      <section id="rankingView">
+        <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <p id="syncStatus" class="text-sm text-[#766b5f]">
+              Sincronización no configurada
+            </p>
+            <p id="eloDeviation" class="text-xs text-[#766b5f]">
+              Desviación: 0 / 0,0%
+            </p>
+          </div>
+          <button
+            id="refreshBtn"
+            class="text-sm font-bold text-coral hover:underline"
+          >
+            ↻ Actualizar
+          </button>
+        </div>
+        <div class="panel overflow-x-auto rounded-xl">
+          <table class="w-full min-w-[650px] text-left text-sm">
+            <thead
+              class="border-b border-[#ddcdb8] text-xs uppercase tracking-wider text-[#766b5f]"
+            >
+              <tr>
+                <th class="px-5 py-4"># Jugador</th>
+                <th>Elo</th>
+                <th>V</th>
+                <th>D</th>
+                <th>% victorias</th>
+                <th>Partidas</th>
+                <th>Última partida</th>
+              </tr>
+            </thead>
+            <tbody id="rankingBody"></tbody>
+          </table>
+          <div id="emptyRanking" class="hidden p-10 text-center text-[#766b5f]">
+            Añade jugadores para empezar la partida.
+          </div>
+        </div>
+      </section>
+      <section id="historyView" class="hidden">
+        <div id="historyBody" class="space-y-3"></div>
+        <p id="emptyHistory" class="hidden py-12 text-center text-[#766b5f]">
+          Todavía no hay partidas registradas.
+        </p>
+      </section>
+      <section id="playersView" class="hidden">
+        <div class="mb-4 flex justify-end">
+          <button
+            id="addPlayerBtn"
+            class="rounded-lg border border-coral px-4 py-2 text-sm font-bold text-coral hover:bg-[#fff8ed]"
+          >
+            ＋ Añadir jugador
+          </button>
+        </div>
+        <div
+          id="playersBody"
+          class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
+        ></div>
+      </section>
+      <section id="decksView" class="hidden">
+        <div class="mb-4 flex items-center justify-between gap-3">
+          <div>
+            <p class="text-sm text-[#766b5f]">Versiones disponibles</p>
+            <h2 class="font-display text-2xl font-bold">Barajas</h2>
+          </div>
+          <button
+            id="manageDeckBtn"
+            class="rounded-lg border border-coral px-4 py-2 text-sm font-bold text-coral hover:bg-[#fff8ed]"
+          >
+            ＋ Añadir baraja
+          </button>
+        </div>
+        <div id="decksBody" class="grid gap-3 sm:grid-cols-2"></div>
+      </section>
+    </main>
+    <div
+      id="gameModal"
+      class="modal fixed inset-0 z-20 hidden items-center justify-center p-4"
+    >
+      <div
+        class="panel max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl p-6"
+      >
+        <div class="mb-5 flex justify-between">
+          <div>
+            <p class="text-xs font-bold uppercase tracking-wider text-coral">
+              Resultado
+            </p>
+            <h2 class="font-display text-2xl font-bold">Nueva partida</h2>
+          </div>
+          <button class="close text-2xl" data-close="gameModal">×</button>
+        </div>
+        <div class="mb-5 flex items-end gap-3">
+          <label class="block flex-1 text-sm font-bold"
+            >Baraja<select
+              id="deckSelect"
+              class="mt-2 w-full rounded-lg border border-[#cbb99f] bg-white p-3"
+            ></select
+          ></label>
+          <button
+            id="addDeckBtn"
+            class="rounded-lg border border-coral px-3 py-3 text-sm font-bold text-coral"
+            title="Añadir una baraja"
+          >
+            ＋ Nueva
+          </button>
+        </div>
+        <label class="mb-5 block text-sm font-bold"
+          >Jugadores participantes<select
+            id="playerCount"
+            class="mt-2 w-full rounded-lg border border-[#cbb99f] bg-white p-3"
+          >
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+            <option>5</option>
+            <option>6</option>
+          </select></label
+        >
+        <div id="participantFields" class="space-y-3"></div>
+        <p class="mt-4 text-xs text-[#766b5f]">
+          Ordena del primer puesto al último. El Elo se recalcula desde todo el
+          historial.
+        </p>
+        <button
+          id="saveGameBtn"
+          class="mt-6 w-full rounded-lg bg-coral px-4 py-3 font-bold text-white"
+        >
+          Guardar partida
+        </button>
+      </div>
+    </div>
+    <div
+      id="deckModal"
+      class="modal fixed inset-0 z-20 hidden items-center justify-center p-4"
+    >
+      <div class="panel w-full max-w-md rounded-xl p-6">
+        <div class="mb-5 flex justify-between">
+          <div>
+            <p class="text-xs font-bold uppercase tracking-wider text-coral">
+              Catálogo
+            </p>
+            <h2 class="font-display text-2xl font-bold">Nueva baraja</h2>
+          </div>
+          <button class="close text-2xl" data-close="deckModal">×</button>
+        </div>
+        <label class="mb-4 block text-sm font-bold"
+          >Nombre<input
+            id="deckName"
+            class="mt-2 w-full rounded-lg border border-[#cbb99f] bg-white p-3"
+            maxlength="60"
+            placeholder="Fallera Calavera"
+        /></label>
+        <label class="block text-sm font-bold"
+          >Versión o edición
+          <input
+            id="deckVersion"
+            class="mt-2 w-full rounded-lg border border-[#cbb99f] bg-white p-3"
+            maxlength="40"
+            placeholder="Original, Deluxe, expansión..."
+        /></label>
+        <button
+          id="saveDeckBtn"
+          class="mt-6 w-full rounded-lg bg-coral px-4 py-3 font-bold text-white"
+        >
+          Guardar baraja
+        </button>
+      </div>
+    </div>
+    <div
+      id="playerModal"
+      class="modal fixed inset-0 z-20 hidden items-center justify-center p-4"
+    >
+      <div class="panel w-full max-w-md rounded-xl p-6">
+        <div class="mb-5 flex justify-between">
+          <h2 id="playerModalTitle" class="font-display text-2xl font-bold">
+            Añadir jugador
+          </h2>
+          <button class="close text-2xl" data-close="playerModal">×</button>
+        </div>
+        <label class="mb-4 block text-sm font-bold"
+          >Nombre<input
+            id="playerName"
+            class="mt-2 w-full rounded-lg border border-[#cbb99f] bg-white p-3"
+            maxlength="40" /></label
+        ><label class="block text-sm font-bold"
+          >Elo inicial<input
+            id="playerElo"
+            type="number"
+            min="0"
+            max="4000"
+            value="100"
+            class="mt-2 w-full rounded-lg border border-[#cbb99f] bg-white p-3" /></label
+        ><button
+          id="savePlayerBtn"
+          class="mt-6 w-full rounded-lg bg-coral px-4 py-3 font-bold text-white"
+        >
+          Guardar
+        </button>
+      </div>
+    </div>
+    <div
+      id="settingsModal"
+      class="modal fixed inset-0 z-20 hidden items-center justify-center p-4"
+    >
+      <div class="panel w-full max-w-lg rounded-xl p-6">
+        <div class="mb-5 flex justify-between">
+          <div>
+            <p class="text-xs font-bold uppercase tracking-wider text-coral">
+              Persistencia
+            </p>
+            <h2 class="font-display text-2xl font-bold">
+              Configuración GitHub
+            </h2>
+          </div>
+          <button class="close text-2xl" data-close="settingsModal">×</button>
+        </div>
+        <p class="mb-4 text-sm text-[#766b5f]">
+          El repositorio ya está configurado para toda la partida. Tus amigos
+          solo necesitan la contraseña de edición.
+        </p>
+        <div class="grid gap-3 sm:grid-cols-2">
+          <label class="text-sm font-bold"
+            >Propietario<input
+              id="ghOwner"
+              readonly
+              class="mt-2 w-full rounded-lg border border-[#cbb99f] bg-[#f4eadb] p-3" /></label
+          ><label class="text-sm font-bold"
+            >Repositorio<input
+              id="ghRepo"
+              readonly
+              class="mt-2 w-full rounded-lg border border-[#cbb99f] bg-[#f4eadb] p-3"
+          /></label>
+        </div>
+        <label class="mt-3 block text-sm font-bold"
+          >Rama<input
+            id="ghBranch"
+            readonly
+            value="main"
+            class="mt-2 w-full rounded-lg border border-[#cbb99f] bg-[#f4eadb] p-3" /></label
+        ><label class="mt-3 block text-sm font-bold"
+          >Token del propietario<input
+            id="ghToken"
+            type="password"
+            class="mt-2 w-full rounded-lg border border-[#cbb99f] bg-white p-3"
+            placeholder="Solo para configurar este navegador"
+        /></label>
+        <p class="mt-2 text-xs text-[#766b5f]">
+          Para compartir sin GitHub, configura un token nuevo en
+          <code>BUILT_IN_TOKEN</code> dentro de <code>app.js</code> antes de
+          publicar.
+        </p>
+        <div class="mt-5 flex gap-3">
+          <button
+            id="saveSettingsBtn"
+            class="flex-1 rounded-lg bg-coral px-4 py-3 font-bold text-white"
+          >
+            Guardar y cargar</button
+          ><button
+            id="localModeBtn"
+            class="rounded-lg border border-[#cbb99f] px-4 py-3 font-bold"
+          >
+            Modo local
+          </button>
+        </div>
+      </div>
+    </div>
+    <div
+      id="toast"
+      class="fixed bottom-5 right-5 hidden rounded-lg bg-[#24211e] px-4 py-3 text-sm font-bold text-white"
+    ></div>
+    <script src="app.js"></script>
+  </body>
 </html>
