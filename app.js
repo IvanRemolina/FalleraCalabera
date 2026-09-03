@@ -395,16 +395,21 @@ function renderSimulator() {
       select.onchange = updatePlayerSelection;
     });
 
+    const runningRatings = new Map(
+      finalParticipants.map((player) => [player.id, Math.round(player.elo || 100)]),
+    );
+
     for (let runIndex = 0; runIndex < selectedCount; runIndex += 1) {
       const winnerSelect = document.querySelector(`.simulator-winner[data-run="${runIndex}"]`);
       const winnerIndex = finalParticipants.findIndex((player) => player.id === winnerSelect?.value);
       const entries = simulateMatchElo(
         finalParticipants.map((player, index) => ({
           ...player,
-          elo: Math.round(player.elo || 100),
+          elo: runningRatings.get(player.id) ?? Math.round(player.elo || 100),
           isWinner: index === winnerIndex,
         })),
       );
+      entries.forEach((entry) => runningRatings.set(entry.id, entry.newElo));
       const playersHost = document.querySelector(`[data-simulation-players="${runIndex}"]`);
       if (playersHost) {
         playersHost.innerHTML = entries
