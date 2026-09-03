@@ -116,6 +116,19 @@ function normalizeDecks() {
   db.decks = db.decks.map(normalizeDeck);
 }
 
+function normalizePlayers() {
+  db.players.forEach((player) => {
+    player.startingElo = Number.isFinite(player.startingElo)
+      ? player.startingElo
+      : Number.isFinite(player.elo)
+        ? player.elo
+        : Number.isFinite(player.initialElo)
+          ? player.initialElo
+        : 100;
+    player.initialElo = 100;
+  });
+}
+
 // Fórmula multinomial equivalente a la hoja de cálculo: amplitud 400 y K=25.
 function expected(elo, participantElos) {
   const weights = participantElos.map((rating) => 10 ** (rating / 400));
@@ -134,7 +147,7 @@ function applyEloChange(elo, change) {
 // después se reproducen las partidas en orden cronológico.
 function recalculate() {
   db.players.forEach((p) => {
-    p.elo = p.initialElo;
+    p.elo = p.startingElo ?? 100;
     p.wins = 0;
     p.losses = 0;
     p.games = 0;
@@ -205,7 +218,7 @@ function sortPlayers(players, mode = "alphabetic") {
 
 function evolutionSnapshots() {
   const players = new Map(
-    db.players.map((player) => [player.id, { ...player, elo: player.initialElo }]),
+    db.players.map((player) => [player.id, { ...player, elo: player.startingElo ?? 100 }]),
   );
   const snapshots = [
     { date: null, ratings: new Map([...players].map(([id, player]) => [id, player.elo])) },
@@ -280,8 +293,8 @@ function renderEvolution() {
   }).join("");
   const lines = players.map((player, playerIndex) => {
     const color = colors[playerIndex % colors.length];
-    const points = snapshots.map((snapshot, index) => `${x(index)},${y(snapshot.ratings.get(player.id) ?? player.initialElo)}`).join(" ");
-    const dots = snapshots.map((snapshot, index) => `<circle cx="${x(index)}" cy="${y(snapshot.ratings.get(player.id) ?? player.initialElo)}" r="4" fill="${color}" class="chart-point" data-player="${esc(player.name)}" data-elo="${snapshot.ratings.get(player.id) ?? player.initialElo}" data-date="${snapshot.date || "Inicio"}"/>`).join("");
+    const points = snapshots.map((snapshot, index) => `${x(index)},${y(snapshot.ratings.get(player.id) ?? player.startingElo ?? 100)}`).join(" ");
+    const dots = snapshots.map((snapshot, index) => `<circle cx="${x(index)}" cy="${y(snapshot.ratings.get(player.id) ?? player.startingElo ?? 100)}" r="4" fill="${color}" class="chart-point" data-player="${esc(player.name)}" data-elo="${snapshot.ratings.get(player.id) ?? player.startingElo ?? 100}" data-date="${snapshot.date || "Inicio"}"/>`).join("");
     return `<polyline points="${points}" fill="none" stroke="${color}" stroke-width="2"/>${dots}`;
   }).join("");
   chart.innerHTML = `${grid}${lines}`;
@@ -329,7 +342,7 @@ function render() {
   $("#playersBody").innerHTML = orderedPlayers
     .map(
       (p) =>
-        `<article class="panel flex items-center justify-between rounded-xl p-4"><div><b>${esc(p.name)}</b><p class="text-sm text-[#766b5f]">Elo ${p.elo} · Inicial ${p.initialElo} · ${p.games} partidas</p></div><div class="flex gap-3"><button class="editPlayer text-sm font-bold text-coral" data-id="${p.id}">Editar</button><button class="deletePlayer text-sm font-bold text-[#b84339]" data-id="${p.id}">Eliminar</button></div></article>`,
+        `<article class="panel flex items-center justify-between rounded-xl p-4"><div><b>${esc(p.name)}</b><p class="text-sm text-[#766b5f]">Elo ${p.elo} · Base ${p.startingElo ?? 100} · ${p.games} partidas</p></div><div class="flex gap-3"><button class="editPlayer text-sm font-bold text-coral" data-id="${p.id}">Editar</button><button class="deletePlayer text-sm font-bold text-[#b84339]" data-id="${p.id}">Eliminar</button></div></article>`,
     )
     .join("");
   $("#decksBody").innerHTML = db.decks
@@ -476,6 +489,7 @@ async function loadRemote(silent = false) {
     db.players ??= [];
     db.games ??= [];
     db.decks ??= [];
+    normalizePlayers();
     normalizeDecks();
     render();
     $("#syncStatus").textContent =
@@ -665,12 +679,14 @@ $("#savePlayerBtn").onclick = async () => {
   if (editingId) {
     const player = db.players.find((p) => p.id === editingId);
     player.name = name;
-    player.initialElo = elo;
+    player.startingElo = elo;
+    player.initialElo = 100;
   } else
     db.players.push({
       id: crypto.randomUUID(),
       name,
-      initialElo: elo,
+      initialElo: 100,
+      startingElo: elo,
       elo,
       wins: 0,
       losses: 0,
@@ -711,7 +727,7 @@ document.addEventListener("click", async (e) => {
       $("#playerModalTitle").textContent = "Editar jugador";
       $("#savePlayerBtn").textContent = "Guardar cambios";
       $("#playerName").value = player.name;
-      $("#playerElo").value = player.initialElo;
+      $("#playerElo").value = player.startingElo ?? player.initialElo ?? 100;
       show("#playerModal");
     }
   }

@@ -105,7 +105,7 @@ Además, las partidas nuevas guardan el identificador de la baraja y las edicion
 
 Las partidas antiguas sin `deckId` siguen siendo válidas y se muestran como “Baraja no especificada”. Las barajas antiguas que solo tenían nombre y versión se adaptan automáticamente a una edición. Eliminar una baraja ya utilizada está bloqueado para no perder la referencia histórica.
 
-Cada jugador conserva su identificador, nombre y Elo inicial. Cada partida conserva la fecha y los identificadores de los jugadores en orden de clasificación, del primer puesto al último. El Elo actual y las estadísticas se reconstruyen al cargar los datos, por lo que el historial es la fuente de verdad.
+Cada jugador conserva su identificador, nombre, un Elo teórico inicial de `100` y un `startingElo` que representa el Elo actual importado cuando no existe el historial antiguo. Las partidas nuevas se calculan desde ese valor de partida. Cada partida conserva la fecha y los identificadores de los jugadores en orden de clasificación, del primer puesto al último. El Elo actual y las estadísticas de las partidas nuevas se reconstruyen al cargar los datos; la desviación siempre se compara con `100 × número de jugadores`.
 
 ## Estructura
 
