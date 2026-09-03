@@ -492,9 +492,8 @@ function startAutoSync() {
 
 // Controles principales de configuración, pestañas y creación de partidas.
 $("#settingsBtn").onclick = () => {
-  if (!ensureAccess()) return;
   const c = config();
-  ["owner", "repo", "branch", "token"].forEach(
+  ["owner", "repo", "branch"].forEach(
     (k) => ($("#gh" + k[0].toUpperCase() + k.slice(1)).value = c[k] || ""),
   );
   show("#settingsModal");
@@ -508,13 +507,14 @@ $("#themeToggle").onclick = () => {
 
 $("#saveSettingsBtn").onclick = () => {
   if (!ensureAccess()) return;
+  const current = config();
   localStorage.setItem(
     KEY,
     JSON.stringify({
-      owner: DEFAULT_CONFIG.owner,
-      repo: DEFAULT_CONFIG.repo,
-      branch: DEFAULT_CONFIG.branch,
-      token: $("#ghToken").value.trim(),
+      owner: $("#ghOwner").value.trim() || DEFAULT_CONFIG.owner,
+      repo: $("#ghRepo").value.trim() || DEFAULT_CONFIG.repo,
+      branch: $("#ghBranch").value.trim() || DEFAULT_CONFIG.branch,
+      token: current.token,
     }),
   );
   show("#settingsModal", false);
