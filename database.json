@@ -57,6 +57,15 @@
       "wins": 0,
       "losses": 0,
       "games": 0
+    },
+    {
+      "id": "85c305b8-7871-4356-8b09-fae682145b5e",
+      "name": "Marc",
+      "initialElo": 100,
+      "elo": 100,
+      "wins": 0,
+      "losses": 0,
+      "games": 0
     }
   ],
   "games": [],
