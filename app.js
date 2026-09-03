@@ -89,6 +89,12 @@ function dateText(iso) {
   });
 }
 
+function dateInputValue(iso) {
+  const date = new Date(iso);
+  const offset = date.getTimezoneOffset() * 60000;
+  return new Date(date.getTime() - offset).toISOString().slice(0, 10);
+}
+
 function deckLabel(deck) {
   if (!deck) return "Baraja no especificada";
   return deck.name;
@@ -132,6 +138,7 @@ function recalculate() {
     p.wins = 0;
     p.losses = 0;
     p.games = 0;
+    p.lastGame = undefined;
   });
   for (const game of [...db.games].sort(
     (a, b) => new Date(a.date) - new Date(b.date),
@@ -149,6 +156,7 @@ function recalculate() {
     changes.forEach(([p, change, place]) => {
       p.elo = applyEloChange(ratings.get(p.id) ?? p.elo, change);
       p.games++;
+      p.lastGame = game.date;
       if (place === 0) p.wins++;
       else p.losses++;
     });
@@ -537,6 +545,9 @@ $("#newGameBtn").onclick = () => {
     return toast("Necesitas al menos 2 jugadores", true);
   $("#gameCountInput").value = 1;
   $("#playerCount").value = 2;
+  editingGameId = null;
+  $("#gameModalTitle").textContent = "Nuevas partidas";
+  $("#gameDate").value = dateInputValue(new Date().toISOString());
   deckInputs();
   participantInputs();
   show("#gameModal");
@@ -547,6 +558,28 @@ $("#participantFields").onchange = winnerInputs;
 $("#playerSortSelect").onchange = render;
 $("#evolutionStart").onchange = renderEvolution;
 $("#evolutionEnd").onchange = renderEvolution;
+document.addEventListener("click", (event) => {
+  const editButton = event.target.closest(".editGame");
+  if (!editButton || !ensureCanEdit()) return;
+  const game = db.games.find((item) => item.id === editButton.dataset.id);
+  if (!game) return;
+  editingGameId = game.id;
+  $("#gameModalTitle").textContent = "Editar partida";
+  $("#gameCountInput").value = 1;
+  $("#playerCount").value = game.players.length;
+  $("#gameDate").value = dateInputValue(game.date);
+  $("#deckSelect").value = game.deckId || "";
+  editionInputs(game.editions || [1]);
+  participantInputs();
+  document.querySelectorAll(".participant").forEach((select, index) => {
+    select.value = game.players[index] || "";
+  });
+  winnerInputs();
+  document.querySelectorAll(".winner-select").forEach((select) => {
+    select.value = game.players[0];
+  });
+  show("#gameModal");
+});
 $("#saveGameBtn").onclick = async () => {
   if (!ensureCanEdit()) return;
   const ids = [...document.querySelectorAll(".participant")].map((x) => x.value.trim());
@@ -561,10 +594,24 @@ $("#saveGameBtn").onclick = async () => {
   const winners = [...document.querySelectorAll(".winner-select")].map((select) => select.value);
   if (winners.some((id) => !id))
     return toast("Selecciona el ganador de cada partida", true);
-  const now = Date.now();
-  winners.forEach((winnerId, index) => {
+  const dateValue = $("#gameDate").value;
+  if (!dateValue) return toast("Selecciona una fecha", true);
+  if (editingGameId) {
+    const game = db.games.find((item) => item.id === editingGameId);
+    const date = new Date(`${dateValue}T12:00:00`).toISOString();
+    if (!game) return toast("No se encontró la partida", true);
+    game.date = date;
+    game.players = [winners[0], ...ids.filter((id) => id !== winners[0])];
+    game.deckId = deckId;
+    game.editions = editions;
+    show("#gameModal", false);
+    render();
+    await persist("Modificar partida");
+    return;
+  }
+  winners.forEach((winnerId) => {
     const players = [winnerId, ...ids.filter((id) => id !== winnerId)];
-    const date = new Date(now + index).toISOString();
+    const date = new Date(`${dateValue}T12:00:00`).toISOString();
     db.games.push({ id: crypto.randomUUID(), date, players, deckId, editions });
     players.forEach((id) => {
       const player = db.players.find((item) => item.id === id);
